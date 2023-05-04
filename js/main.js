@@ -21,7 +21,7 @@ function _main_(){
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 50 )
+	gamey.distributeAgents( utils, agents, terrain, 500 )
 	//WHY ARE AGENTS BRING CREATED OUTSIDE OF THE TERRAIN ON THE RIGHT AND BOTTOM???
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
@@ -82,7 +82,7 @@ function _main_(){
 						// player.x = mouse.x+camera.left
 						let xy = {x: mouse.x+camera.left, y: mouse.y+camera.top}
 						// gamey.createAgentAtLoc(utils, agents, xy)
-						gamey.createAgentNextToAgent( utils, agents, agents[1] )
+						gamey.createAgentNextToAgent( utils, agents, agents[0] )
 						break;
 					case `middle`:
 						console.log(`mid click`)

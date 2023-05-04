@@ -26,17 +26,10 @@ class Agent{
 	constructor( gameID, x, y, radius, speed, color ){
 		this._id = gameID
 
-		this._radius = Math.abs( radius )
+		this._radius = Math.abs( radius ) || 1
 
-		if( x < radius ){
-			x = radius
-		}
-		this._x = x || radius // 0 is farthest left in game world
-		
-		if( y < radius ){
-			y = radius
-		}
-		this._y = y || radius // 0 is highest up in game world
+		this._x = x || 0 // 0 is farthest left in game world
+		this._y = y || 0 // 0 is highest up in game world
 		
 		this._speed = speed * 8 + (radius*2) || 1 // meters per second (10px per meter) // taller people walk faster
 		this._color = color || 'yellow' // draw color

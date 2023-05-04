@@ -1,11 +1,25 @@
-
 class Utilities {
+	binary() {
+		return Math.random() >= 0.5 ? 1 : 0
+	}
 	rollDice ( rolls, sides ) {
 		let sum = 0
 		for( let i = 0; i < rolls; i++ ) {
 			sum += Math.floor( Math.random() * sides ) + 1
 		}
 		return sum
+	}
+
+	gaussianRange( floor, ceiling ) {
+		// Returns a float between floor and ceiling which is normally distributed
+		console.info(`gaussian(${floor}, ${ceiling})`)
+
+		let range = Math.abs(ceiling - floor)
+		let sigma = 0
+		for ( let i=0; i < range; i++ ) {
+			sigma += Math.random() // a uniformly distributed float between zero and 1 
+		}
+		return floor + sigma
 	}
 
 	randomRGB(){ // return an RGB string
@@ -23,9 +37,9 @@ class Utilities {
 		}
 	}
 
-	randomLocation( rect ){
-		return { x: Math.floor( Math.random() * rect.width ), 
-			y: Math.floor( Math.random() * rect.height ) }
+	randomXY( boundingRectangle ){
+		return { x: Math.random() * boundingRectangle.width,
+				 y: Math.random() * boundingRectangle.height }
 	}
 
 	randomSkinToneRGB(){
@@ -92,5 +106,16 @@ class Utilities {
 
 	randomLowHigh( low, high ){ // random number between low and high
 		return Math.floor( Math.random() * ( high - low + 1) ) + low
+	}
+
+	descriptiveStatistics(set){
+		console.log(`descriptiveStatistics(set)`)
+
+		// mean
+		// variance
+		// standard deviation
+		// min, max
+		// mode
+		// median
 	}
 }

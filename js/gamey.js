@@ -38,7 +38,7 @@ class Gamey {
 
 		let agent = {}
 		for( let i = 0; i < howMany; i++ ) {
-			loc = utils.randomLocation( terrain )
+			loc = utils.randomXY( terrain )
 			rSex = utils.randomLowHigh(0,1)
 
 			radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10
@@ -69,17 +69,19 @@ class Gamey {
 
 		let agent = {}
 		for( let i = 0; i < howMany; i++ ) {
-			loc = utils.randomLocation( terrain )
-			rSex = utils.randomLowHigh(0,1)
+			loc = utils.randomXY( terrain )
+			rSex = utils.binary()
 
 			radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10
 			skinTone = utils.randomSkinToneRGB().string
-			agent = new Agent( i, loc.x, loc.y, radius, 1, skinTone )
+			//agent = new Agent( i, loc.x, loc.y, radius, 1, skinTone )
+			agent = new Agent( i, 0, 0, radius, 1, skinTone )
 			agents.push( agent )
 			
 			agent.sex = rSex
 			do {
-				age = utils.rollDice(12,15) - 60
+				//age = utils.rollDice(12,15) - 60
+				age = utils.gaussianRange(0,100)
 			}
 			while (age < 0) // probability distribution is skewed into negative numbers
 			agent.age = age
@@ -115,10 +117,10 @@ class Gamey {
 		agent.age = age
 	}
 	createAgentNextToAgent( utils, agents, agent ){
-		console.info(`createAgentNextToAgent()`)
+		console.info(`createAgentNextToAgent( utils{}, agents[], agent:${agent} )`)
 		let agentID = agents.length
 		let loc
-		let rSex = utils.randomLowHigh(0,1) // 0 = female, 1 = male
+		let rSex = utils.binary() // 0 = female, 1 = male
 		let radius = 1
 		let speed = 1
 		let skinTone = ""
