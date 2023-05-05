@@ -72,7 +72,9 @@ class Gamey {
 			loc = utils.randomXY( terrain )
 			rSex = utils.binary()
 
-			radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10
+			//radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10
+			radius = utils.testGaussiangRandgom(1.778, .0762) // male 70 inch mean and 3 inch stdDev
+			
 			skinTone = utils.randomSkinToneRGB().string
 			//agent = new Agent( i, loc.x, loc.y, radius, 1, skinTone )
 			agent = new Agent( i, 0, 0, radius, 1, skinTone )
@@ -80,8 +82,7 @@ class Gamey {
 			
 			agent.sex = rSex
 			do {
-				//age = utils.rollDice(12,15) - 60
-				age = utils.gaussianRange(0,100)
+				age = utils.rollDice(12,15) - 60
 			}
 			while (age < 0) // probability distribution is skewed into negative numbers
 			agent.age = age

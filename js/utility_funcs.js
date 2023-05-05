@@ -10,16 +10,28 @@ class Utilities {
 		return sum
 	}
 
-	gaussianRange( floor, ceiling ) {
-		// Returns a float between floor and ceiling which is normally distributed
-		console.info(`gaussian(${floor}, ${ceiling})`)
+	testGaussiangRandgom( mean=0, stdDev=1 ) {
+		// Standard Normal variate using Box-Muller transform.
+		let u1 = 1 - Math.random() // converting 0 <= x < 1 to 0 < x <= 1
+		let u2 = Math.random()
+		let z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2)
+		// transform to the desired mean and standard deviation:
+		return z * stdDev + mean
+	}
 
-		let range = Math.abs(ceiling - floor)
-		let sigma = 0
-		for ( let i=0; i < range; i++ ) {
-			sigma += Math.random() // a uniformly distributed float between zero and 1 
-		}
-		return floor + sigma
+	generateGaussianNoise( mean = 0, stdDev = 1 ){
+		let two_pi = 2.0 * Math.PI
+
+		//create two random numbers, make sure u1 is greater than epsilon
+		let u1 = Math.random() * (1- Number.EPSILON ) + Number.EPSILON
+		let u2 = Math.random()
+
+		// compute z0, z1
+		let mag = stdDev * Math.sqrt(-2.0 * Math.log(u1))
+		let z0 = mag * Math.cos(two_pi * u2) + mean
+		let z1 = mag * Math.sin(two_pi * u2) + mean
+
+		return {z0, z1}
 	}
 
 	randomRGB(){ // return an RGB string
