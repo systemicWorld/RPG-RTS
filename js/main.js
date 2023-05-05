@@ -23,6 +23,7 @@ function _main_(){
 
 	gamey.distributeAgents( utils, agents, terrain, 500 )
 	// warsh your gawd dam hangs boi
+	// i did maw and my booty too
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 
