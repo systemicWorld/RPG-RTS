@@ -22,6 +22,7 @@ function _main_(){
 	//let gameObjectsOnCamera = [] // good for debugging
 
 	gamey.distributeAgents( utils, agents, terrain, 500 )
+	// warsh your gawd dam hangs boi
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 
