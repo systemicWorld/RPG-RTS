@@ -22,7 +22,6 @@ function _main_(){
 	//let gameObjectsOnCamera = [] // good for debugging
 
 	gamey.distributeAgents( utils, agents, terrain, 500 )
-	//WHY ARE AGENTS BRING CREATED OUTSIDE OF THE TERRAIN ON THE RIGHT AND BOTTOM???
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 
