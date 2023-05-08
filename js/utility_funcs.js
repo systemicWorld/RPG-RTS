@@ -10,9 +10,9 @@ class Utilities {
 		return sum
 	}
 
-	testGaussiangRandgom( mean=0, stdDev=1 ) {
+	gaussianRandom( mean=0, stdDev=1 ) {
 		// Standard Normal variate using Box-Muller transform.
-		let u1 = 1 - Math.random() // converting 0 <= x < 1 to 0 < x <= 1
+		let u1 = 1 - Math.random() // converting 0<=x<1 to 0<x<=1
 		let u2 = Math.random()
 		let z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2)
 		// transform to the desired mean and standard deviation:
@@ -123,11 +123,22 @@ class Utilities {
 	descriptiveStatistics(set){
 		console.log(`descriptiveStatistics(set)`)
 
+		let n = set.length
 		// mean
+		let m = set.reduce((a, b) => a + b) / n
+
 		// variance
+		let ss = set.reduce((a, b) => a + ((b-m)^2) / n )
+		
 		// standard deviation
+		let s = Math.sqrt(ss)
+
 		// min, max
+		let min = Math.min(...set)
+		let max = Math.max(...set)
 		// mode
 		// median
+// Expected output: 1
+		console.info(`n=${n}, m=${m}, v=${ss}, stdDev=${s}, min=${min}, max=${max}`)
 	}
 }

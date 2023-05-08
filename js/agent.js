@@ -1,30 +1,6 @@
-{ // nervous system simulation
-	class AutonomicNervousSystem{
-		// Comprised of the Sympathetic Nervous System & Parasympathetic Nervous System
-		constructor(){
-			this._SNS = new SympatheticNervousSystem()
-			this._PSNS = new ParasympatheticNervousSystem()
-		}
-	}
-
-	class SympatheticNervousSystem{
-		// Fight > flight > freeze
-		constructor(){
-			this._threatLevel = 0
-		}
-	}
-
-	class ParasympatheticNervousSystem{
-		// Breed & Feed, Rest & Digest
-		constructor(){
-			this._attractionLevel = 0
-		}
-	}
-}
-
 class Agent{
 	constructor( gameID, x, y, radius, speed, color ){
-		this._id = gameID
+		this._id = gameID || NaN
 
 		this._radius = Math.abs( radius ) || 1
 
@@ -77,6 +53,9 @@ class Agent{
 	get mother() { return this._mother }
 	get pregnant() { return this._pregnant }
 	// Setters
+	set id( id ){
+		this._id = id
+	}
 	set x( x ) {
 		this._x = x
 		this._left = x - this._radius
