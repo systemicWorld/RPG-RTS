@@ -1,6 +1,6 @@
 class Menu {
 	constructor () {
-		console.log("Menu.constructor()")
+		// console.log(`Menu.constructor()`)
 		this._menu = document.body.querySelector( "#guiWrap" ) || false // fails if constructed at program start
 		this._wavChans = 0
 	}

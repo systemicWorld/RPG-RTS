@@ -21,7 +21,7 @@ function _main_(){
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 500 )
+	gamey.distributeAgents( utils, agents, terrain, 200 )
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 

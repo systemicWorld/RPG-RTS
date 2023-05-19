@@ -12,12 +12,11 @@ class Gamey {
 
 		let human = {}
 
-		// testing normal curve function
-		if (sex){//male
+		if (sex==1){//male
 			radius = utils.gaussianRandom(1.778, 0.0762) // male 70 inch mean and 3 inch stdDev
 		}else{//female
-			//radius = utils.guassianRandom(1.61798, 0.05588)// 1.61798
-		}// // //
+			radius = utils.gaussianRandom(1.618, 0.0559)// 1.618 meters
+		}
 
 		skinTone = utils.randomSkinToneRGB().string
 		
@@ -64,7 +63,10 @@ class Gamey {
 			agent.x=loc.x
 			agent.y=loc.y
 		}
-		
+		let males = this.getAllMales(agents)
+		let malesRadaii = []
+		males.forEach(male => malesRadaii.push(male.radius))
+		utils.descriptiveStatistics(malesRadaii)
 	}
 
 	createAgentAtLoc( utils, agents, coords ){
@@ -142,7 +144,7 @@ class Gamey {
 		return females
 	}
 	getAllMales( population )  {
-		console.info( `getAllMales()` )
+		console.info( `getAllMales(population)` )
 		let males = []
 		let individual = population[0]
 		for( let i = 0; i < population.length; i++ ){
@@ -152,6 +154,17 @@ class Gamey {
 			}
 		}
 		return males
+		/*
+const array1 = ['a', 'b', 'c'];
+
+array1.forEach(element => console.log(element));
+
+// Expected output: "a"
+// Expected output: "b"
+// Expected output: "c"
+		let males = population.forEach(human => (human.sex == 1) ? males.push(human)} )
+		return males
+		*/
 	}
 	calcAverageRadius( circles ) {
 		console.info( `calcAverageRadius()` )

@@ -126,12 +126,12 @@ class Utilities {
 		let n = set.length
 		// mean
 		let m = set.reduce((a, b) => a + b) / n
-
+	
 		// variance
-		let ss = set.reduce((a, b) => a + ((b-m)^2) / n )
+		let v = set.reduce( (a, b) => a + (b-m)*(b-m) ) / n
 		
 		// standard deviation
-		let s = Math.sqrt(ss)
+		let s = Math.sqrt(v)
 
 		// min, max
 		let min = Math.min(...set)
@@ -139,6 +139,6 @@ class Utilities {
 		// mode
 		// median
 // Expected output: 1
-		console.info(`n=${n}, m=${m}, v=${ss}, stdDev=${s}, min=${min}, max=${max}`)
+		console.info(`n=${n}, m=${m}, v=${v}, stdDev=${s}, min=${min}, max=${max}`)
 	}
 }
