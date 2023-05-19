@@ -3,6 +3,30 @@ class Gamey {
 	createChildAgent(){
 		console.log(`createChildNode()`)
 	}
+	createHuman( utils ) { 
+		console.info(`createHuman()`)
+		let sex = utils.binary() // 1 = male
+		let radius = 1
+		let skinTone = ""
+		let age = 0
+
+		let human = {}
+
+		// testing normal curve function
+		if (sex){//male
+			radius = utils.gaussianRandom(1.778, 0.0762) // male 70 inch mean and 3 inch stdDev
+		}else{//female
+			//radius = utils.guassianRandom(1.61798, 0.05588)// 1.61798
+		}// // //
+
+		skinTone = utils.randomSkinToneRGB().string
+		
+		human = new Agent( NaN, 0, 0, radius, 1, skinTone )
+		human.sex = sex
+		human.age = age
+
+		return human
+	}
 	createHumanAgent( objectID ){
 		console.log(`createHumanAgent()`)
 
@@ -27,122 +51,43 @@ class Gamey {
 		while (age < 0) // probability distribution is skewed into negative numbers
 		agent.age = age
 	}
-	/*
-	distributeAgents( utils, gameObjects, terrain, howMany ){
-		//console.info("distributeAgents()")
-		let loc
-		let rSex = 1 // 1 = male
-		let radius = 1
-		let skinTone = ""
-		let age = 0
 
-		let agent = {}
-		for( let i = 0; i < howMany; i++ ) {
-			loc = utils.randomXY( terrain )
-			rSex = utils.randomLowHigh(0,1)
-
-			radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10
-			skinTone = utils.randomSkinToneRGB().string
-			agent = new Agent( i, loc.x, loc.y, radius, 1, skinTone )
-			gameObjects.push( agent )
-			
-			agent.sex = rSex
-			do {
-				age = utils.rollDice(12,15) - 60
-			}
-			while (age < 0) // probability distribution is skewed into negative numbers
-			agent.age = age
-		}
-
-		this.findSizeIncrease( gameObjects )
-		console.info(`Mean Age: ${this.calcAverageAge(gameObjects)}`)
-		this.findAgeRange(gameObjects)
-	}
-	*/
 	distributeAgents( utils, agents, terrain, howMany ){
-		//console.info("distributeAgents()")
+		console.info("distributeAgents()")
 		let loc
-		let rSex = 1 // 1 = male
-		let radius = 1
-		let skinTone = ""
-		let age = 0
-
-		let agent = {}
-		for( let i = 0; i < howMany; i++ ) {
+		let agent = this.createHuman(utils) // meh :/
+		for(let i=0;i<howMany;i++){
+			agent = this.createHuman(utils)
+			agents.push(agent)
+			agent.age=30
 			loc = utils.randomXY( terrain )
-			rSex = utils.binary()
-
-			//radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10
-			radius = utils.testGaussiangRandgom(1.778, .0762) // male 70 inch mean and 3 inch stdDev
-			
-			skinTone = utils.randomSkinToneRGB().string
-			//agent = new Agent( i, loc.x, loc.y, radius, 1, skinTone )
-			agent = new Agent( i, 0, 0, radius, 1, skinTone )
-			agents.push( agent )
-			
-			agent.sex = rSex
-			do {
-				age = utils.rollDice(12,15) - 60
-			}
-			while (age < 0) // probability distribution is skewed into negative numbers
-			agent.age = age
+			agent.x=loc.x
+			agent.y=loc.y
 		}
-
-		this.findSizeIncrease( agents )
-		console.info(`Mean Age: ${this.calcAverageAge(agents)}`)
-		this.findAgeRange(agents)
-	}
-	createAgentAtLoc( utils, agents, xyObj ){
-		console.info(`createAgentAtLoc()`)
-		let loc
-		let rSex = 1 // 1 = male
-		let radius = 1
-		let skinTone = ""
-		let age = 0
-
-		let agent = {}
 		
-		loc = xyObj
-		rSex = utils.randomLowHigh(0,1)
+	}
 
-		radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10
-		skinTone = utils.randomSkinToneRGB().string
-		agent = new Agent( agents.length, loc.x, loc.y, radius, 10, skinTone )
+	createAgentAtLoc( utils, agents, coords ){
+		console.info(`createAgentAtLoc(gameID??)`)
+		let agent = this.createHuman(utils)
+		agent.x = coords.x
+		agent.y = coords.y
 		agents.push( agent )
-		
-		agent.sex = rSex
-		do {
-			age = utils.rollDice(12,15) - 60
-		}
-		while (age < 0) // probability distribution is skewed into negative numbers
-		agent.age = age
 	}
+
 	createAgentNextToAgent( utils, agents, agent ){
 		console.info(`createAgentNextToAgent( utils{}, agents[], agent:${agent} )`)
 		let agentID = agents.length
 		let loc
-		let rSex = utils.binary() // 0 = female, 1 = male
-		let radius = 1
-		let speed = 1
-		let skinTone = ""
-		let age = 0
-
-		let newAgent = {}
 		
-		radius = (utils.rollDice( 7, 5 ) * .5 * (rSex+10))/10 
-
-		loc = {x: agent.x + agent.radius + radius, y: agent.y} // complicated reason for this function
-
-		skinTone = utils.randomSkinToneRGB().string
-		newAgent = new Agent( agentID, loc.x, loc.y, radius, speed, skinTone )
-		agents.push( newAgent )
+		let human = this.createHuman(utils)
 		
-		newAgent.sex = rSex
-		do {
-			age = utils.rollDice(12,15) - 60
-		}
-		while (age < 0) // probability distribution is skewed into negative numbers
-		newAgent.age = age
+		loc = {x: agent.x + agent.radius + human.radius, y: agent.y} // complicated reason for this function
+
+		human.id=agentID
+		human.x=loc.x
+		human.y=loc.y
+		agents.push( human )
 	}
 
 	colorAgentsBySex( agents ){
@@ -196,7 +141,7 @@ class Gamey {
 		}
 		return females
 	}
-	getAllMales( population ){
+	getAllMales( population )  {
 		console.info( `getAllMales()` )
 		let males = []
 		let individual = population[0]
