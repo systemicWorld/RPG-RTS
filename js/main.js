@@ -66,8 +66,9 @@ function _main_(){
 		}
 		{
 			if( keyboard.pressedKeys.fire ){
-				fireProjectile()	
+				//fireProjectile()	
 			}
+		}
 
 		{ // this block is for testing purposes.. allow put the player anywhere instantly with RIGHT click
 			// if( mouse.pressedButtons.right ) {
