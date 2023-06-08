@@ -1,17 +1,14 @@
-class Agent{
-	constructor( gameID, x, y, radius, speed, color ){
-		this._id = gameID || NaN
-
-		this._radius = radius || 1
+class Projectile{
+	constructor( x, y){
+		this._radius = 1
 
 		this._x = x || 0 // 0 is farthest left in game world
 		this._y = y || 0 // 0 is highest up in game world
 		
 		/* Sound barrier at sea level: 343 meters/second 
         barrel length, bullet weight, powder weight*/
-		this._speed = speed || 331 // meters per second (10px per meter)
-		this._color = color || 'red' // paint color
-		this._secondColor = color
+		this._speed = 1 // meters per second (10px per meter)
+		this._color = 'red' // paint color
 
 		// Bounding Box
 		this._left = this._x - this._radius
@@ -26,21 +23,15 @@ class Agent{
 
 	}
 	// Getters
-	get id() { return this._id }
 	get x() { return this._x }
 	get y() { return this._y }
 	get radius() { return this._radius }
 	get speed() { return this._speed }
-	get sex() { return this._sex }
 	get left() { return this._left }
 	get top() { return this._top }
 	get right() { return this._right }
 	get bottom() { return this._bottom }
-	get age() { return this._age }
 	// Setters
-	set id( id ){
-		this._id = id
-	}
 	set x( x ) {
 		this._x = x
 		this._left = x - this._radius
@@ -70,15 +61,7 @@ class Agent{
 	set secondColor( string ){
 		this._secondColor = string // CSS colors, or RGB[A]() string
 	}
-	set age( num ){
-		this._age = num
-	}
 	// Methods
-	act( player, dTime ){
-		// console.info(`act()`)
-
-		this.avoid(player, dTime)
-	}
 	onCam ( camera ){
 			// check if within camera bounds
 			if( this._top > camera.bottom ||
