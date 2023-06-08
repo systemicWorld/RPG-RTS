@@ -8,7 +8,8 @@ class Keyboard {
 			left: false,
 			right: false,
 			up: false,
-			down: false
+			down: false,
+			fire: false
 		}
 		// link action names to keyCodes
 		this._keyMap = {
@@ -16,7 +17,8 @@ class Keyboard {
 			68: 'right',
 			65: 'left',
 			87: 'up',
-			83: 'down'
+			83: 'down',
+			105: 'fire'
 		}
 		// create listeners
 		window.addEventListener( "keydown", (event)=>{ this.keyDown(event, this._pressedKeys, this._keyMap) } )
