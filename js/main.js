@@ -63,12 +63,12 @@ function _main_(){
 			if( keyboard.pressedKeys.left && !keyboard.pressedKeys.right ){
 				player.x -= player.speed * SECONDS_PER_TICK
 			}
-		}
+		}/*
 		{
 			if( keyboard.pressedKeys.fire ){
 				gamey.fireProjectile()	
 			}
-		}
+		}*/
 
 		{ // this block is for testing purposes.. allow put the player anywhere instantly with RIGHT click
 			// if( mouse.pressedButtons.right ) {
