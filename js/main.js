@@ -66,7 +66,7 @@ function _main_(){
 		}
 		{
 			if( keyboard.pressedKeys.fire ){
-				//fireProjectile()	
+				gamey.fireProjectile()	
 			}
 		}
 
