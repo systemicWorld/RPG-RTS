@@ -46,8 +46,6 @@ function _main_(){
 		// update the state of the world based on determined time step
 		// dont update if player wants pause
 		
-		//clock.clockDisplay() // would be cool to have a clock in game 
-		
 		if ( keyboard.pressedKeys.menu ) { // escape key pressed === true
 			menu.show()
 		}
@@ -66,6 +64,10 @@ function _main_(){
 				player.x -= player.speed * SECONDS_PER_TICK
 			}
 		}
+		{
+			if( keyboard.pressedKeys.fire ){
+				fireProjectile()	
+			}
 
 		{ // this block is for testing purposes.. allow put the player anywhere instantly with RIGHT click
 			// if( mouse.pressedButtons.right ) {
