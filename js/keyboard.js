@@ -1,4 +1,4 @@
-// Declaring a Class
+// Declaring a Class, helps determine what keys user is/has pressing
 class Keyboard {
 	constructor() {
 		this._buffer = [] // buffer of clicked keys 
