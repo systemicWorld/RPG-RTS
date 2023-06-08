@@ -4,8 +4,6 @@ function _main_(){
 	let mouse = new Mouse()
 	
 	let audio = new Audio() // GUI linked - wav channels, mixes
-	let clock = new Clock() // Real time and game time
-	clock.clockDisplay()
 	let gamey = new Gamey() // Higher order utilities
 
 	let canvas = document.getElementById("mainCanvas") // Get the canvas element form the page
