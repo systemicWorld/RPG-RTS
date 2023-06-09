@@ -193,4 +193,12 @@ array1.forEach(element => console.log(element));
 		let percentIncrease = [(maleMean - femaleMean)/femaleMean] * 100
 		console.info(`incease: ${percentIncrease}`)// 
 	}
+	fireProjectile ( bullets ) {
+		console.info(`fireProjectile()`)
+		let bullet = new Projectile(0,0)
+
+		bullets.push( bullet )
+
+		// need a direction
+	}
 }

@@ -19,9 +19,11 @@ function _main_(){
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 200 )
+	gamey.distributeAgents( utils, agents, terrain, 21 )
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
+
+	let bullets = []
 
 	setup_game()
 	function setup_game(){
@@ -61,12 +63,12 @@ function _main_(){
 			if( keyboard.pressedKeys.left && !keyboard.pressedKeys.right ){
 				player.x -= player.speed * SECONDS_PER_TICK
 			}
-		}/*
+		}
 		{
 			if( keyboard.pressedKeys.fire ){
-				gamey.fireProjectile()	
+				gamey.fireProjectile(bullets)	
 			}
-		}*/
+		}
 
 		{ // this block is for testing purposes.. allow put the player anywhere instantly with RIGHT click
 			// if( mouse.pressedButtons.right ) {
@@ -103,6 +105,9 @@ function _main_(){
 			// agents[i].bond(SECONDS_PER_TICK)
 			agents[i].act(player, SECONDS_PER_TICK)
 		}
+		bullets.forEach( b => { b.move(dTime)
+			
+		})
 		/* CAMERA ///////////////////////////////////////////////
 		// Adjust at end to determine what's an intersting view
 		// Rule 1: Player never leaves the view
@@ -122,6 +127,9 @@ function _main_(){
 			if ( agents[i].draw( ctx, camera, viewport ) == true ) {
 				drawnObjects.push(agents[i])
 			}
+		}
+		for( let i = 0; i < bullets.length; i++){
+			bullets[i].draw( ctx, camera, viewport )
 		}
 		gameObjectsOnCamera = drawnObjects
 		//console.log("Objects drawn on cam: "+gameObjectsOnCamera.length)

@@ -9,6 +9,9 @@ class Projectile{
         barrel length, bullet weight, powder weight*/
 		this._speed = 1 // meters per second (10px per meter)
 		this._color = 'red' // paint color
+		this._secondColor = `blue`
+
+		this._vector = 0 
 
 		// Bounding Box
 		this._left = this._x - this._radius
@@ -74,36 +77,40 @@ class Projectile{
 			}
 	}
 	draw( ctx, camera, viewport ){
-    let drawOnCam = true
-    if ( this.onCam(camera) ){
-      ctx.fillStyle = this._color // change to gradient below
-    }else{ // for debug, camera rect' will be smaller than screen bounds
-      ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
-      drawOnCam = false
-    }
-    // Create a radial gradient
-	// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
-    //let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
+		let drawOnCam = true
+		if ( this.onCam(camera) ){
+		ctx.fillStyle = this._color // change to gradient below
+		}else{ // for debug, camera rect' will be smaller than screen bounds
+		ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
+		drawOnCam = false
+		}
+		// Create a radial gradient
+		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
+		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
 
-	let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
-	let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
-	let rOutter = this._radius * 10 / viewport.aspectRatio
+		let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
+		let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
+		let rOutter = this._radius * 10 / viewport.aspectRatio
 
-	let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
+		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
 
-    // Add color stops
-    gradient.addColorStop(0.6, this._color)
-    gradient.addColorStop(1, this._secondColor)
-	ctx.fillStyle = gradient
+		// Add color stops
+		gradient.addColorStop(0.6, this._color)
+		gradient.addColorStop(1, this._secondColor)
+		ctx.fillStyle = gradient
 
-    // Define a circular path
-    ctx.beginPath()
-    // ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
-    ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
-    // Set the fill style and draw a circle
-    ctx.fill()
+		// Define a circular path
+		ctx.beginPath()
+		// ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
+		ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
+		// Set the fill style and draw a circle
+		ctx.fill()
 
-    return drawOnCam
+		return drawOnCam
 	}
 	// Acts
+	move( dTime ){
+		this.x += .1*dTime * this.speed
+		this.y += dTime * this._vector
+	}
 }

@@ -18,7 +18,7 @@ class Keyboard {
 			65: 'left',
 			87: 'up',
 			83: 'down',
-			105: 'fire'
+			32: 'fire'
 		}
 		// create listeners
 		window.addEventListener( "keydown", (event)=>{ this.keyDown(event, this._pressedKeys, this._keyMap) } )
@@ -30,13 +30,12 @@ class Keyboard {
 	// Setters
 	// Methods
 	keyDown( e, pressedKeys, keyMap ) {
-		//console.info("keyDown("+e.key+")")
-    
+		//console.info(`keyDown(${e.keyCode})`)
 		let key = keyMap[e.keyCode]
     	pressedKeys[key] = true
 	}
 	keyUp( e, pressedKeys, keyMap ) {
-		//console.info("keyUp("+e.key+")")
+		//console.info(`keyUp(${e.keyCode})`)
 		let key = keyMap[e.keyCode] // use event.key for actual letters
 		pressedKeys[key] = false
 	}
