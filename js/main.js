@@ -19,7 +19,7 @@ function _main_(){
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 21 )
+	gamey.distributeAgents( utils, agents, terrain, 2 )
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 
@@ -44,7 +44,13 @@ function _main_(){
 		quadTree = new QuadTree(2)
 		quadTree.width = terrain.width
 		quadTree.height = terrain.height
-		quadTree.createNewGeneration()
+		//quadTree.createNewGeneration()
+		// add agents to tree
+		//agents[0].left = 31
+		//agents[0].y = 80
+		for(let i =0; i<agents.length;i++){
+			quadTree.insert(agents[i])
+		}
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
@@ -141,6 +147,7 @@ function _main_(){
 		//camera.draw( ctx ) // draw bounding box for debug purposes
 		//viewport.draw( ctx )
 		quadTree.drawDeep( ctx, camera, viewport )
+		quadTree.intersecting(ctx, camera, viewport )
 	}
 	
 

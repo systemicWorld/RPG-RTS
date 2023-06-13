@@ -2,7 +2,7 @@ class QuadTree {
 	constructor( maxGenerations, parent, generation) {
 		this._parent = parent || null
 		this._children = []
-        this._intersections = []
+        //this._intersections = []
 		this._generation = generation || 0
         this._maxGenerations = maxGenerations || 0
         this._left = 0
@@ -55,15 +55,17 @@ class QuadTree {
         let halfHeight = 0.5 * this.height
         let newQuad = {}
 
-        for ( let i = 0; i < 4; i++ ){
-            newQuad = new QuadTree( this.maxGenerations, this, generationNumber ) 
-            newQuad.left = (i % 2 * halfWidth) + this.left
-            newQuad.top = (i % 2 * halfHeight) + this.top
-            newQuad.width = halfWidth
-            newQuad.height = halfHeight
-            
-            this.children.push( newQuad )
+        for ( let i = 0; i < 2; i++ ){
+            for ( let k = 0; k < 2; k++ ){
+                newQuad = new QuadTree( this.maxGenerations, this, generationNumber ) 
+                newQuad.left = (k % 2 * halfWidth) + this.left
+                newQuad.top = (i % 2 * halfHeight) + this.top
+                newQuad.width = halfWidth
+                newQuad.height = halfHeight
+                this.children.push( newQuad )
+            }
         }
+        console.log(`Children created: ${this.children.length}`)
 	}
     print(){
         console.info(`Quad info: Left:${this.left}, Top:${this.top}, Width:${this.width}, Height:${this.height}`)
@@ -87,56 +89,116 @@ class QuadTree {
             }
         }
     }
-    insert( box ){
-        console.info(`insert(rects)`)
+    insert( agent ){
+        //console.info(`insert(agent)`)
 
         if(this.children.length){
             let midWidth = 0.5*this.width
             let midHeight = 0.5*this.height
 
-            if( box.left < midWidth ){
-                // box's left side is in left half
-                if( box.right < midWidth ) {
-                    // box is entirely in left half
-                    if( box.top < midHeight ){
-                        // box starts in top left child doesn't cross verticle  fold
-                        if ( box.bottom < midHeight ) {
-                            // box is bounded by top left child
-                            this.children[0].insert(box)
+            if( agent.left < midWidth ){
+                // agent's left side is in left half
+                if( agent.right < midWidth ) {
+                    // agent is entirely in left half
+                    if( agent.top < midHeight ){
+                        // agent starts in top left child doesn't cross verticle  fold
+                        if ( agent.bottom < midHeight ) {
+                            // agent is bounded by top left child
+                            //console.log(`top left`)
+                            this.children[0].insert(agent)
+                            //this.children[0].print()
+                            //agent.print()
                         } else {
-                            // box is on the left horizontal fold
+                            // agent is on the left horizontal fold
                             // need more variables or containers
+                            //console.log(`on fold`)
+                            this.children[0].insert(agent)
+                            this.children[3].insert(agent)
                         }
                     } else {
-                        // box bounded by bottom left child
-                        this.children[2].insert(box)
+                        // agent bounded by bottom left child
+                        //console.log(`bottom left`)
+                        this.children[2].insert(agent)
+                        //this.children[2].print()
+                        //agent.print()
                     }
                 } else {
-                    // box starts in left half and ends in right half
-                    if( box.bottom < midHeight ) {
-                        // box is on top verticle fold
+                    // agent starts in left half and ends in right half
+                    if( agent.bottom < midHeight ) {
+                        // agent is on top verticle fold
+                        //console.log(`on fold`)
+                        this.children[0].insert(agent)
+                        this.children[1].insert(agent)
                     } else {
-                        // box is on bottom verticle fold
+                        if( agent.top > midHeight ){
+                            // agent is on bottom verticle fold
+                            //console.log(`on fold`)
+                            this.children[2].insert(agent)
+                            this.children[3].insert(agent)
+                        } else {
+                            // agent is on center
+                            //console.log(`on center`)
+                            this.children[0].insert(agent)
+                            this.children[1].insert(agent)
+                            this.children[2].insert(agent)
+                            this.children[3].insert(agent)
+                        }
                     }
                 }
             } else {
-                // box's left side is in right half
-                if( box.top > midHeight ) {
-                    // box is entirely in bottom right
-                    this.children[3].insert(box)
+                // agent's left side is in right half
+                if( agent.top > midHeight ) {
+                    // agent is entirely in bottom right
+                    //console.log(`bottom right`)
+                    this.children[3].insert(agent)
+                    //this.children[3].print()
+                    //agent.print()
                 } else {
-                    // box may cross right horizontal fold
-                    if(box.bottom < midHeight ){
-                        // box is bounded by top left child
-                        this.children[2].insert()
+                    // agent may cross right horizontal fold
+                    if(agent.bottom < midHeight ){
+                        // agent is bounded by top right child
+                        //console.log(`top right`)
+                        this.children[1].insert(agent)
+                        //this.children[1].print()
+                        //agent.print()
                     } else {
-                        // box is on right horizontal fold
+                        // agent is on right horizontal fold
                         // need stuff
+                        //console.log(`on fold`)
+                        this.children[1].insert(agent)
+                        this.children[2].insert(agent)
                     }
                 }
             }
         }else{
-            this._contents.push(box)
+            this.contents.push(agent)
+            //console.log(`Agent inserted in generation ${this.generation}`)
+            //return this.contents.slice(0, -1)
         }
     }
+    remove(){
+        console.info(`remove()`)
+    }
+    clear(){
+        console.info(`clear()`)
+
+        this.contents = []
+    }
+    intersecting(ctx, camera, viewport ){
+        //console.info(`intersecting()`)
+        //console.log(`generation:${this.generation}`)
+        return
+        if(this.children.length){
+            //console.log('children')
+            for( let i = 0; i < this.children.length; i++ ){
+                this.children[i].intersecting( ctx, camera, viewport )
+            }
+        }else{
+            for( let k = 0; k < this.contents.length; k++ ){
+                this.contents[k].highlight( ctx, camera, viewport )
+            }
+        }
+    }
+
+
 }

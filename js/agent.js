@@ -2,7 +2,7 @@ class Agent{
 	constructor( gameID, x, y, radius, speed, color ){
 		this._id = gameID || NaN
 
-		this._radius = Math.abs( radius ) || 1
+		this._radius = radius * 10|| 1
 
 		this._x = x || 0 // 0 is farthest left in game world
 		this._y = y || 0 // 0 is highest up in game world
@@ -11,7 +11,7 @@ class Agent{
 		1.34 for females under 30
 		leg length and mass
 		age, sex, size, fitness */
-		this._speed = speed * 8 + (radius*2) || 1 // meters per second (10px per meter) // taller people walk faster
+		this._speed = speed * 18 + (radius*2) || 1 // meters per second (10px per meter) // taller people walk faster
 		this._color = color || 'yellow' // draw color
 		this._secondColor = color
 
@@ -63,12 +63,15 @@ class Agent{
 	set x( x ) {
 		this._x = x
 		this._left = x - this._radius
-		this._right = x - this._radius
+		this._right = x + this._radius
 	}
 	set y( y ) {
 		this._y = y
 		this._top = y - this._radius
 		this._bottom = y + this._radius
+	}
+	set left( left ) {
+		this.x = left+this._radius
 	}
 	set radius( radius ){
 		this._radius = radius
@@ -124,36 +127,66 @@ class Agent{
 			}
 	}
 	draw( ctx, camera, viewport ){
-    let drawOnCam = true
-    if ( this.onCam(camera) ){
-      ctx.fillStyle = this._color // change to gradient below
-    }else{ // for debug, camera rect' will be smaller than screen bounds
-      ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
-      drawOnCam = false
-    }
-    // Create a radial gradient
-	// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
-    //let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
+		let drawOnCam = true
+		if ( this.onCam(camera) ){
+		ctx.fillStyle = this._color // change to gradient below
+		}else{ // for debug, camera rect' will be smaller than screen bounds
+		ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
+		drawOnCam = false
+		}
+		// Create a radial gradient
+		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
+		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
 
-	let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
-	let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
-	let rOutter = this._radius * 10 / viewport.aspectRatio
+		let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
+		let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
+		let rOutter = this._radius / viewport.aspectRatio
 
-	let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
+		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
 
-    // Add color stops
-    gradient.addColorStop(0.6, this._color)
-    gradient.addColorStop(1, this._secondColor)
-	ctx.fillStyle = gradient
+		// Add color stops
+		gradient.addColorStop(0.6, this._color)
+		gradient.addColorStop(1, this._secondColor)
+		ctx.fillStyle = gradient
 
-    // Define a circular path
-    ctx.beginPath()
-    // ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
-    ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
-    // Set the fill style and draw a circle
-    ctx.fill()
+		// Define a circular path
+		ctx.beginPath()
+		// ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
+		ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
+		// Set the fill style and draw a circle
+		ctx.fill()
 
-    return drawOnCam
+		return drawOnCam
+	}
+	highlight( ctx, camera, viewport ){
+		let drawOnCam = true
+		if ( this.onCam(camera) ){
+		ctx.fillStyle = "red" // change to gradient below
+		}else{ // for debug, camera rect' will be smaller than screen bounds
+		ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
+		drawOnCam = false
+		}
+		// Create a radial gradient
+		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
+		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
+
+		let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
+		let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
+		let rOutter = this._radius / viewport.aspectRatio
+
+		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
+
+		// Add color stops
+		gradient.addColorStop(0.6, "red")
+		gradient.addColorStop(1, "red")
+		ctx.fillStyle = gradient
+
+		// Define a circular path
+		ctx.beginPath()
+		// ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
+		ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
+		// Set the fill style and draw a circle
+		ctx.fill()		
 	}
 	// Acts
 	seek( agent, dTime ){ // move toward gameObject
@@ -243,5 +276,8 @@ class Agent{
 		console.log(`birth()`)
 
 		this._pregnant = false
+	}
+	print(){
+		console.info(`Agent..left:${this.left}, top:${this.top}, right:${this.right}`)
 	}
 }
