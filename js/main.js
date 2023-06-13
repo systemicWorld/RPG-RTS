@@ -25,6 +25,7 @@ function _main_(){
 
 	let bullets = []
 
+	let quadTree = {}
 	setup_game()
 	function setup_game(){
 		console.log(`setup_game()`)
@@ -40,6 +41,10 @@ function _main_(){
 		//gamey.mateBehavior ( gamey )
 	
 		//badguy.color = 'red'
+		quadTree = new QuadTree(2)
+		quadTree.width = terrain.width
+		quadTree.height = terrain.height
+		quadTree.createNewGeneration()
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
@@ -135,6 +140,7 @@ function _main_(){
 		//console.log("Objects drawn on cam: "+gameObjectsOnCamera.length)
 		//camera.draw( ctx ) // draw bounding box for debug purposes
 		//viewport.draw( ctx )
+		quadTree.drawDeep( ctx, camera, viewport )
 	}
 	
 
