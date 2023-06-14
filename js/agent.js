@@ -197,6 +197,7 @@ class Agent{
 	}
 
 	avoid( agent, dTime ) { // move away from gameObject
+		return
 		let avoidanceDistance = 50
 		let goX = agent.x
 		let goY = agent.y

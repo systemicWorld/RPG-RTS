@@ -96,48 +96,33 @@ class QuadTree {
             let midWidth = 0.5*this.width
             let midHeight = 0.5*this.height
 
-            if( agent.left < midWidth ){
-                // agent's left side is in left half
-                if( agent.right < midWidth ) {
-                    // agent is entirely in left half
-                    if( agent.top < midHeight ){
-                        // agent starts in top left child doesn't cross verticle  fold
+            if( agent.left < midWidth ){ // agent's left side is in left half
+                if( agent.right < midWidth ) { // agent is entirely in left half
+                    if( agent.top < midHeight ){ // agent starts in top left child doesn't cross verticle  fold
                         if ( agent.bottom < midHeight ) {
-                            // agent is bounded by top left child
                             //console.log(`top left`)
                             this.children[0].insert(agent)
-                            //this.children[0].print()
-                            //agent.print()
                         } else {
-                            // agent is on the left horizontal fold
-                            // need more variables or containers
-                            //console.log(`on fold`)
+                            //console.log(`left fold`)
                             this.children[0].insert(agent)
                             this.children[3].insert(agent)
                         }
                     } else {
-                        // agent bounded by bottom left child
                         //console.log(`bottom left`)
                         this.children[2].insert(agent)
-                        //this.children[2].print()
-                        //agent.print()
                     }
-                } else {
-                    // agent starts in left half and ends in right half
+                } else { // agent starts in left half and ends in right half
                     if( agent.bottom < midHeight ) {
-                        // agent is on top verticle fold
-                        //console.log(`on fold`)
+                        //console.log(`on top fold`)
                         this.children[0].insert(agent)
                         this.children[1].insert(agent)
                     } else {
                         if( agent.top > midHeight ){
-                            // agent is on bottom verticle fold
-                            //console.log(`on fold`)
+                            //console.log(`bottom fold`)
                             this.children[2].insert(agent)
                             this.children[3].insert(agent)
                         } else {
-                            // agent is on center
-                            //console.log(`on center`)
+                            //console.log(`center`)
                             this.children[0].insert(agent)
                             this.children[1].insert(agent)
                             this.children[2].insert(agent)
@@ -145,26 +130,16 @@ class QuadTree {
                         }
                     }
                 }
-            } else {
-                // agent's left side is in right half
+            } else { // agent's left side is in right half
                 if( agent.top > midHeight ) {
-                    // agent is entirely in bottom right
                     //console.log(`bottom right`)
                     this.children[3].insert(agent)
-                    //this.children[3].print()
-                    //agent.print()
-                } else {
-                    // agent may cross right horizontal fold
+                } else { // agent may cross right horizontal fold
                     if(agent.bottom < midHeight ){
-                        // agent is bounded by top right child
                         //console.log(`top right`)
                         this.children[1].insert(agent)
-                        //this.children[1].print()
-                        //agent.print()
                     } else {
-                        // agent is on right horizontal fold
-                        // need stuff
-                        //console.log(`on fold`)
+                        //console.log(`right fold`)
                         this.children[1].insert(agent)
                         this.children[2].insert(agent)
                     }
@@ -174,6 +149,7 @@ class QuadTree {
             this.contents.push(agent)
             //console.log(`Agent inserted in generation ${this.generation}`)
             //return this.contents.slice(0, -1)
+            // return the indentity of the containing quad
         }
     }
     remove(){
@@ -187,18 +163,36 @@ class QuadTree {
     intersecting(ctx, camera, viewport ){
         //console.info(`intersecting()`)
         //console.log(`generation:${this.generation}`)
-        return
+    
         if(this.children.length){
             //console.log('children')
             for( let i = 0; i < this.children.length; i++ ){
                 this.children[i].intersecting( ctx, camera, viewport )
             }
         }else{
-            for( let k = 0; k < this.contents.length; k++ ){
-                this.contents[k].highlight( ctx, camera, viewport )
+            // BRUTE FORCE METHOD ..
+            let a = {}, b = {}, d = 0.0, k = 0, f = 0, l = this.contents.length
+            for( k = 0; k < l; k++ ){
+                a = this.contents[k]
+                //console.log(`a.x=${a.x} a.y=${a.y}`)
+                for( f = 0; f < l; f++ ){
+                    //console.log(`a.id=${a.id}, b.id=${b.id}`)
+                    if(a.id == b.id){
+                        continue
+                    }
+                    b = this.contents[f]
+                    
+                    //console.log(`ax-bx = ${(a.x-b.x)**2}`)
+
+                    //console.log(`b.x=${b.x} b.y=${b.y}`)
+                    
+                    //d = Math.sqrt( ((a.x - b.x)**2) + ((a.y - b.y)**2) )
+                
+                    //console.log(`Equation: ${d}=Math.sqrt( (${a.x}-${b.x})^2+(${a.y}-${b.y})^2  )`)
+                    //this.contents[k].highlight( ctx, camera, viewport )
+                
+                }
             }
         }
     }
-
-
 }

@@ -57,7 +57,9 @@ class Gamey {
 		let agent = this.createHuman(utils) // meh :/
 		for(let i=0;i<howMany;i++){
 			agent = this.createHuman(utils)
+			agent.id = agents.length
 			agents.push(agent)
+
 			agent.age=30
 			loc = utils.randomXY( terrain )
 			agent.x=loc.x
