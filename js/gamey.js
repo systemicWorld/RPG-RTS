@@ -1,8 +1,5 @@
 // Functions the game uses that are beyond mere utility functions
 class Gamey {
-	createChildAgent(){
-		console.log(`createChildNode()`)
-	}
 	createHuman( utils ) { 
 		console.info(`createHuman()`)
 		let sex = utils.binary() // 1 = male
@@ -22,33 +19,14 @@ class Gamey {
 		
 		human = new Agent( NaN, 0, 0, radius, 1, skinTone )
 		human.sex = sex
-		human.age = age
 
-		return human
-	}
-	createHumanAgent( objectID ){
-		console.log(`createHumanAgent()`)
-
-		let sex = 0
-		let radius = 1
-		let skinTone = ""
-		let age = 0
-
-		let agent = {}
-
-		sex = utils.randomLowHigh(0,1)
-
-		radius = (utils.rollDice( 7, 5 ) * .5 * (sex+10))/10
-		skinTone = utils.randomSkinToneRGB().string
-		agent = new Agent( objectID, -1, -1, radius, 1, skinTone )
-		gameObjects.push( agent )
-		
-		agent.sex = sex
 		do {
 			age = utils.rollDice(12,15) - 60
 		}
 		while (age < 0) // probability distribution is skewed into negative numbers
-		agent.age = age
+		human.age = age
+
+		return human
 	}
 
 	distributeAgents( utils, agents, terrain, howMany ){
@@ -58,6 +36,7 @@ class Gamey {
 		for(let i=0;i<howMany;i++){
 			agent = this.createHuman(utils)
 			agents.push(agent)
+			agent.id = agents.length
 			agent.age=30
 			loc = utils.randomXY( terrain )
 			agent.x=loc.x
