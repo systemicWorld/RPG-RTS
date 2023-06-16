@@ -15,7 +15,7 @@ function _main_(){
 	let agents = [] // agents seperate from gameObjects due to a lot of interactions?
 	//let gameObjects = []
 
-	let viewport = new Viewport( 0, 0, cWidth, cHeight )
+	let viewport = new Viewport( 0, 0, cWidth+100, cHeight+70 )
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
@@ -77,7 +77,7 @@ function _main_(){
 		}
 		{
 			if( keyboard.pressedKeys.fire ){
-				gamey.fireProjectile(bullets)	
+				gamey.fireProjectile(bullets)
 			}
 		}
 
