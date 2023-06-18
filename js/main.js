@@ -15,7 +15,7 @@ function _main_(){
 	let agents = [] // agents seperate from gameObjects due to a lot of interactions?
 	//let gameObjects = []
 
-	let viewport = new Viewport( 0, 0, cWidth+100, cHeight+70 )
+	let viewport = new Viewport( 0, 0, cWidth, cHeight )
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
@@ -44,13 +44,11 @@ function _main_(){
 		quadTree = new QuadTree(2)
 		quadTree.width = terrain.width
 		quadTree.height = terrain.height
-		//quadTree.createNewGeneration()
+		quadTree.createNewGeneration()
 		// add agents to tree
 		//agents[0].left = 31
 		//agents[0].y = 80
-		for(let i =0; i<agents.length;i++){
-			quadTree.insert(agents[i])
-		}
+		
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
@@ -91,8 +89,8 @@ function _main_(){
 				switch( mouse.buffer.shift() ) {
 					case `left`:
 						console.log(`left click`)
-						// player.y = mouse.y+camera.top
-						// player.x = mouse.x+camera.left
+						 player.y = mouse.y+camera.top
+						 player.x = mouse.x+camera.left
 						let xy = {x: mouse.x+camera.left, y: mouse.y+camera.top}
 						// gamey.createAgentAtLoc(utils, agents, xy)
 						gamey.createAgentNextToAgent( utils, agents, agents[0] )
@@ -116,14 +114,21 @@ function _main_(){
 			// agents[i].bond(SECONDS_PER_TICK)
 			agents[i].act(player, SECONDS_PER_TICK)
 		}
-		bullets.forEach( b => { b.move(dTime)
-			
-		})
+		bullets.forEach( b => { b.move(dTime) })
+
+		//quadTree.intersecting(ctx, camera, viewport )
+		for( let i = 0, agent = {}; i < agents.length; i++ ){
+			agent = agents[i]
+			quadTree.insert(agent)
+		}
+		player.checkIntersections()
+
 		/* CAMERA ///////////////////////////////////////////////
 		// Adjust at end to determine what's an intersting view
 		// Rule 1: Player never leaves the view
 		///////////////////////////////////////////////////////*/
 		camera.nearEdgeAsymptotic( player.x, player.y, terrain.width, terrain.height )
+		quadTree.clear()
 	}
 
 	function display_game( ) { // FPS is throttled, and there's no interpolation
@@ -147,7 +152,6 @@ function _main_(){
 		//camera.draw( ctx ) // draw bounding box for debug purposes
 		//viewport.draw( ctx )
 		quadTree.drawDeep( ctx, camera, viewport )
-		quadTree.intersecting(ctx, camera, viewport )
 	}
 	
 

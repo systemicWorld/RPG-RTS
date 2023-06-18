@@ -91,7 +91,8 @@ class QuadTree {
     }
     insert( agent ){
         //console.info(`insert(agent)`)
-
+        /* 0 1
+           2 3 */
         if(this.children.length){
             let midWidth = 0.5*this.width
             let midHeight = 0.5*this.height
@@ -100,12 +101,12 @@ class QuadTree {
                 if( agent.right < midWidth ) { // agent is entirely in left half
                     if( agent.top < midHeight ){ // agent starts in top left child doesn't cross verticle  fold
                         if ( agent.bottom < midHeight ) {
-                            //console.log(`top left`)
+                            // console.log(`top left`)
                             this.children[0].insert(agent)
                         } else {
-                            //console.log(`left fold`)
+                            // console.log(`left fold`)
                             this.children[0].insert(agent)
-                            this.children[3].insert(agent)
+                            this.children[2].insert(agent)
                         }
                     } else {
                         //console.log(`bottom left`)
@@ -113,7 +114,7 @@ class QuadTree {
                     }
                 } else { // agent starts in left half and ends in right half
                     if( agent.bottom < midHeight ) {
-                        //console.log(`on top fold`)
+                        // console.log(`on top fold`)
                         this.children[0].insert(agent)
                         this.children[1].insert(agent)
                     } else {
@@ -135,31 +136,37 @@ class QuadTree {
                     //console.log(`bottom right`)
                     this.children[3].insert(agent)
                 } else { // agent may cross right horizontal fold
-                    if(agent.bottom < midHeight ){
+                    if( agent.bottom < midHeight ){
                         //console.log(`top right`)
                         this.children[1].insert(agent)
                     } else {
                         //console.log(`right fold`)
                         this.children[1].insert(agent)
-                        this.children[2].insert(agent)
+                        this.children[3].insert(agent)
                     }
                 }
             }
         }else{
             this.contents.push(agent)
             //console.log(`Agent inserted in generation ${this.generation}`)
-            //return this.contents.slice(0, -1)
+            // return this.contents.slice(0, -1)
             // return the indentity of the containing quad
+            agent.nearby = this.contents
         }
     }
     remove(){
         console.info(`remove()`)
     }
+    
     clear(){
-        console.info(`clear()`)
-
-        this.contents = []
+        //console.info(`clear()`)
+        if( this.children.length ) {
+            this.children.forEach((i)=>{ i.clear() })
+        } else {
+            this.contents = []
+        }
     }
+
     intersecting(ctx, camera, viewport ){
         //console.info(`intersecting()`)
         //console.log(`generation:${this.generation}`)

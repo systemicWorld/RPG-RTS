@@ -122,7 +122,9 @@ class Utilities {
 
 	descriptiveStatistics(set){
 		console.log(`descriptiveStatistics(set)`)
-
+		
+		if ( !set.length ) return
+		
 		let n = set.length
 		// mean
 		let m = set.reduce((a, b) => a + b) / n

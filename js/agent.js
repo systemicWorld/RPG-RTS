@@ -14,12 +14,16 @@ class Agent{
 		this._speed = speed * 18 + (radius*2) || 1 // meters per second (10px per meter) // taller people walk faster
 		this._color = color || 'yellow' // draw color
 		this._secondColor = color
+		this._highlight = false
 
 		// Bounding Box
 		this._left = this._x - this._radius
 		this._top = this._y - this._radius
 		this._right = this._x + this._radius
 		this._bottom = this._y + this._radius
+
+		// quadtree interaction
+		this._nearby = [] // the contents of the quadTree quad this agent is in
 
 		// narrative properties
 		this._sex = 0 // zero is female
@@ -52,14 +56,13 @@ class Agent{
 	get top() { return this._top }
 	get right() { return this._right }
 	get bottom() { return this._bottom }
+	get nearby() { return this._nearby }
 	get mate() { return this._mate }
 	get age() { return this._age }
 	get mother() { return this._mother }
 	get pregnant() { return this._pregnant }
 	// Setters
-	set id( id ){
-		this._id = id
-	}
+	set id( id ){ this._id = id }
 	set x( x ) {
 		this._x = x
 		this._left = x - this._radius
@@ -70,9 +73,7 @@ class Agent{
 		this._top = y - this._radius
 		this._bottom = y + this._radius
 	}
-	set left( left ) {
-		this.x = left+this._radius
-	}
+	set left( left ) { this.x = left+this._radius }
 	set radius( radius ){
 		this._radius = radius
 		this._left = this._x - radius
@@ -80,9 +81,8 @@ class Agent{
 		this._right = this._x + radius
 		this._bottom = this._y + radius
 	}
-	set speed( speed ){
-		this._speed = speed
-	}
+	set speed( speed ){ this._speed = speed }
+	set nearby ( quadContents ){ this._nearby = quadContents }
 	/**
    * @param {any} string
    */
@@ -92,6 +92,10 @@ class Agent{
 	set secondColor( string ){
 		this._secondColor = string // CSS colors, or RGB[A]() string
 	}
+	/**
+	 * @param {boolean} bool
+	 */
+	set highlight ( bool ) { this._highlight = bool }
 	set sex( bool ){
 		//console.info(`sex(${bool})`)
 		this._sex = bool
@@ -128,11 +132,11 @@ class Agent{
 	}
 	draw( ctx, camera, viewport ){
 		let drawOnCam = true
-		if ( this.onCam(camera) ){
-		ctx.fillStyle = this._color // change to gradient below
-		}else{ // for debug, camera rect' will be smaller than screen bounds
-		ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
-		drawOnCam = false
+			if ( this.onCam(camera) ){
+			ctx.fillStyle = this._color // change to gradient below
+		} else { // for debug, camera rect' will be smaller than screen bounds
+			ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
+			drawOnCam = false
 		}
 		// Create a radial gradient
 		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
@@ -145,8 +149,8 @@ class Agent{
 		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
 
 		// Add color stops
-		gradient.addColorStop(0.6, this._color)
-		gradient.addColorStop(1, this._secondColor)
+		gradient.addColorStop(0.6, this._highlight ? `red` : this._color)
+		gradient.addColorStop(1, this._highlight ? `red`: this._secondColor)
 		ctx.fillStyle = gradient
 
 		// Define a circular path
@@ -157,36 +161,6 @@ class Agent{
 		ctx.fill()
 
 		return drawOnCam
-	}
-	highlight( ctx, camera, viewport ){
-		let drawOnCam = true
-		if ( this.onCam(camera) ){
-		ctx.fillStyle = "red" // change to gradient below
-		}else{ // for debug, camera rect' will be smaller than screen bounds
-		ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
-		drawOnCam = false
-		}
-		// Create a radial gradient
-		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
-		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
-
-		let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
-		let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
-		let rOutter = this._radius / viewport.aspectRatio
-
-		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
-
-		// Add color stops
-		gradient.addColorStop(0.6, "red")
-		gradient.addColorStop(1, "red")
-		ctx.fillStyle = gradient
-
-		// Define a circular path
-		ctx.beginPath()
-		// ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
-		ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
-		// Set the fill style and draw a circle
-		ctx.fill()		
 	}
 	// Acts
 	seek( agent, dTime ){ // move toward gameObject
@@ -208,6 +182,35 @@ class Agent{
 			let speed = this._speed * dTime
 			this.x -= Math.cos ( theta ) * speed
 			this.y -= Math.sin ( theta ) * speed
+		}
+	}
+
+	checkIntersections(){
+		//console.info(`checkIntersections()`)
+		console.log(`agent.id:${this.id}, nearby:${this._nearby.length}`)
+		if ( this._nearby.length == 0 ) return
+		//console.log(`nearby[i]ID:${this._nearby[1].id}`)
+
+		let r = this._radius
+		let minimumDistance = r // + agent[i].radius
+		let x1 = this.x
+		let y1 = this.y
+		let distance = 0 // Math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
+		// intersection if distance is less than minimum
+		let agent = {}
+		for ( let i = 0; i < this._nearby.length; i++ ){
+			agent = this.nearby[i]
+
+			if( this.id != agent.id ){
+				distance = Math.sqrt( (agent.x - x1)**2 + (agent.y - y1)**2 )
+				minimumDistance = r + agent.radius
+				//console.log(`dis:${distance}, minD:${minimumDistance}`)
+				if( distance < minimumDistance ){
+					// intersecting
+					//console.log(`got something!`)
+					agent.highlight = true
+				}
+			}
 		}
 	}
 
