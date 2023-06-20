@@ -45,10 +45,6 @@ function _main_(){
 		quadTree.width = terrain.width
 		quadTree.height = terrain.height
 		quadTree.createNewGeneration()
-		// add agents to tree
-		//agents[0].left = 31
-		//agents[0].y = 80
-		
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
@@ -119,7 +115,10 @@ function _main_(){
 		//quadTree.intersecting(ctx, camera, viewport )
 		for( let i = 0, agent = {}; i < agents.length; i++ ){
 			agent = agents[i]
-			quadTree.insert(agent)
+			agent.nearby = []
+			
+			quadTree.insert2( agent )
+			
 		}
 		player.checkIntersections()
 

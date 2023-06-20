@@ -154,6 +154,62 @@ class QuadTree {
             agent.nearby = this.contents
         }
     }
+
+    insert2( agent ){
+        //console.log('insert2()')
+        if( this.children.length ){
+            let cW = 0.5 * this.width
+            let cH = 0.5 * this.height
+            let l = agent.left
+            let r = agent.right
+            let t = agent.top
+            let b = agent.bottom
+            //  0  1
+            //  2  3
+            if( r < cW && b < cH ){ 
+                console.log(`top left`)
+                this.children[0].insert2( agent ) // top left 
+            } else if( l > cW && b < cH ){
+                console.log(`top right`)
+                this.children[1].insert2( agent ) // top right
+            } else if( r < cW && t > cH ){
+                console.log(`bottom left`)
+                this.children[2].insert2( agent ) // bottom left
+            } else if( l > cW && t > cH ){
+                console.log(`bottom left`)
+                this.children[3].insert2( agent ) // bottom right
+            } else if( l < cW && r > cW ){
+                if( b < cH ){ // t fold
+                    console.log(`t fold`)
+                    this.children[0].insert2( agent )
+                    this.children[1].insert2( agent )
+                } else { // b fold
+                    console.log(`b fold`)
+                    this.children[2].insert2( agent )
+                    this.children[3].insert2( agent )
+                }
+            } else if( t < cH && b > cH ){
+                if( r < cW ){ // l fold
+                    console.log(`l fold`)
+                    this.children[0].insert2( agent )
+                    this.children[2].insert2( agent )
+                } else { // right f
+                    console.log(`r fold`)
+                    this.children[1].insert2( agent )
+                    this.children[3].insert2( agent )
+                }
+            } else /*if( l < cW && r > cW && t < cH && b > cH )*/{
+                console.log(`center`)
+                this.children[0].insert2( agent )
+                this.children[1].insert2( agent )
+                this.children[2].insert2( agent )gg
+                this.children[3].insert2( agent )
+            }
+        } else {
+            this.contents.push( agent )
+        }
+    }
+
     remove(){
         console.info(`remove()`)
     }
