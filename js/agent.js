@@ -185,11 +185,11 @@ class Agent{
 		}
 	}
 
-	checkIntersections(){
+	checkIntersections(testSet=this._nearby){
 		//console.info(`checkIntersections()`)
-		if ( this._nearby.length == 0 ) return
+		if ( testSet.length == 0 ) return
 		
-		console.log(`agent.id:${this.id}, nearby:${this._nearby.length}`)
+		console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
 
 		let r = this._radius
 		let minimumDistance = r // + agent[i].radius
@@ -198,8 +198,8 @@ class Agent{
 		let distance = 0 // Math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
 		// intersection if distance is less than minimum
 		let agent = {}
-		for ( let i = 0; i < this._nearby.length; i++ ){
-			agent = this._nearby[i]
+		for ( let i = 0; i < testSet.length; i++ ){
+			agent = testSet[i]
 
 			if( this.id != agent.id ){
 				distance = Math.sqrt( (agent.x - x1)**2 + (agent.y - y1)**2 )

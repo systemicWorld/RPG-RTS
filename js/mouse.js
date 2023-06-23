@@ -22,10 +22,11 @@ class Mouse {
 			middle: -1
 		}
 		// create listeners
-		window.addEventListener( "mousemove", (event)=>{ this.move(event) } )
-		window.addEventListener( "mousedown", (event)=>{ this.buttonDown(event, this._pressedButtons, this._buttonMap, this._downTimes) } )
-    	window.addEventListener( "mouseup", (event)=>{ this.buttonUp(event, this._pressedButtons, this._buttonMap, this._downTimes) } )
-		window.addEventListener( "click", (event)=>{ this.buttonClick(this._buffer, event, this._buttonMap) } )
+		window.addEventListener( "mousemove", (e)=>{ this.move(e) } )
+		window.addEventListener( "mousedown", (e)=>{ this.buttonDown(e, this._pressedButtons, this._buttonMap, this._downTimes) } )
+    window.addEventListener( "mouseup", (e)=>{ this.buttonUp(e, this._pressedButtons, this._buttonMap, this._downTimes) } )
+		window.addEventListener( "click", (e)=>{ this.buttonClick(this._buffer, e, this._buttonMap) } )
+		window.addEventListener('contextmenu', (e)=>{ e.preventDefault(); this.rightClick(this._buffer, e, this._buttonMap); return false }, false)
 	}
 	// Getters
 	get x() { return this._x }
@@ -46,7 +47,7 @@ class Mouse {
 		this._y = e.clientY
 	}
 	buttonDown( e, pressedButtons, buttonMap, downTimes ) {
-		console.info(`buttonDown(${e.button}, time:${e.timeStamp})`)
+		// console.info(`buttonDown(${e.button}, time:${e.timeStamp})`)
 		let button = buttonMap[e.button]
 		pressedButtons[button] = true
 		this._x = e.clientX
@@ -54,16 +55,22 @@ class Mouse {
 		downTimes[button] = e.timeStamp
 	}
 	buttonUp( e, pressedButtons, buttonMap, downTimes ) {
-		console.info(`buttonUp(${e.button}, time:${e.timeStamp})`)
+		// console.info(`buttonUp(${e.button}, time:${e.timeStamp})`)
 		let button = buttonMap[e.button] // use event.button for actual letters
 		pressedButtons[button] = false
 		let dT = e.timeStamp - downTimes[button]
-		console.log(`timeLapsed:${dT}`)
+		// console.log(`timeLapsed:${dT}`)
 	}
 	buttonClick( buffer, e, buttonMap ) {
-		console.info(`buttonClick(${e.button})`)
+		// console.info(`buttonClick(${e.button})`)
 		let button = buttonMap[e.button] // use event.button for actual letters
 		buffer.push(button)
-		console.log(buffer)
+		// console.log(buffer)
+	}
+	rightClick( buffer, e, buttonMap ) {
+		// console.info(`rightClick(${e.button})`)
+		let button = buttonMap[e.button] // use event.button for actual letters
+		buffer.push(button)
+		// console.log(buffer)
 	}
 }

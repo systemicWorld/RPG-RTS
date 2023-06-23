@@ -7,8 +7,8 @@ class Human {
 	}
 	// GETTERS
 	get mother() { return this._mother }
-    get father() { return this._father }
-    get sex() { return this._sex }
+	get father() { return this._father }
+	get sex() { return this._sex }
 	// SETTERS
     //
 	// METHODS

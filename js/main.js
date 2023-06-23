@@ -41,16 +41,17 @@ function _main_(){
 		//gamey.mateBehavior ( gamey )
 	
 		//badguy.color = 'red'
+		/* QuadTree */
 		quadTree = new QuadTree(2)
 		quadTree.width = terrain.width
 		quadTree.height = terrain.height
-		quadTree.createNewGeneration()
+		quadTree.addGeneration()
+		quadTree.children[1].addGeneration()
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
 		// update the state of the world based on determined time step
 		// dont update if player wants pause
-		
 		if ( keyboard.pressedKeys.menu ) { // escape key pressed === true
 			menu.show()
 		}
@@ -75,30 +76,26 @@ function _main_(){
 			}
 		}
 
-		{ // this block is for testing purposes.. allow put the player anywhere instantly with RIGHT click
-			// if( mouse.pressedButtons.right ) {
-			// 	// move the player to click coordinate
-			// 	player.y = mouse.y+camera.top
-			// 	player.x = mouse.x+camera.left
-			// }
+		{ 
 			while ( mouse.buffer.length > 0 ){
 				switch( mouse.buffer.shift() ) {
 					case `left`:
-						console.log(`left click`)
-						 player.y = mouse.y+camera.top
-						 player.x = mouse.x+camera.left
-						let xy = {x: mouse.x+camera.left, y: mouse.y+camera.top}
-						// gamey.createAgentAtLoc(utils, agents, xy)
+						// console.log(`left click`)
+						player.y = mouse.y+camera.top
+						player.x = mouse.x+camera.left
 						gamey.createAgentNextToAgent( utils, agents, agents[0] )
 						break;
 					case `middle`:
-						console.log(`mid click`)
+						// console.log(`mid click`)
 						break;
 					case `right`:
-						console.log(`right click`)
+						// console.log(`right click`)
+						// move the player to click coordinate
+						player.y = mouse.y+camera.top
+						player.x = mouse.x+camera.left
 						break;
 					default:
-						console.error(`unspecific click`)
+						console.error(`undefined button clicked`)
 				}
 			}
 		}
@@ -116,11 +113,11 @@ function _main_(){
 		for( let i = 0, agent = {}; i < agents.length; i++ ){
 			agent = agents[i]
 			agent.nearby = []
-			
-			quadTree.insert2( agent )
-			
+			quadTree.insert( agent )
 		}
-		player.checkIntersections()
+		console.log(`return of getIns(): ${quadTree.getInsertions( player )}`)
+		player.nearby = quadTree.getInsertions( player )
+		player.checkIntersections() // turn touched red
 
 		/* CAMERA ///////////////////////////////////////////////
 		// Adjust at end to determine what's an intersting view
@@ -153,6 +150,41 @@ function _main_(){
 		quadTree.drawDeep( ctx, camera, viewport )
 	}
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	function panic(){
 		console.error("panic()")
