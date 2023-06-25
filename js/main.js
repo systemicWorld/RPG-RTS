@@ -11,7 +11,9 @@ function _main_(){
 	let cHeight = canvas.height = window.innerHeight // canvas set to inner height of window
 	let ctx = canvas.getContext("2d")
 
-	let terrain = new Terrain( 1.0 * cWidth, 1.0 * cHeight )
+	// let terrain = new Terrain( 1.0 * cWidth, 1.0 * cHeight )
+
+	let terrain = new Terrain( new Rectangle(0,0,1.0 * cWidth, 1.0 * cHeight ) )
 	let agents = [] // agents seperate from gameObjects due to a lot of interactions?
 	//let gameObjects = []
 
@@ -40,7 +42,7 @@ function _main_(){
 	
 		//badguy.color = 'red'
 		/* QuadTree */
-		quadTree = new QuadTree(3)
+		quadTree = new QuadTree( 0,0,terrain.width, terrain.height, 3)
 		quadTree.width = terrain.width
 		quadTree.height = terrain.height
 		quadTree.addGenerations(2)

@@ -1,19 +1,25 @@
 class QuadTree {
-	constructor( maxGenerations, parent, generation) {
-		this._parent = parent || null
-		this._children = []
+    constructor( maxGenerations, parent, generation) {
+        this._parent = parent || null
+        this._children = []
         //this._intersections = []
-		this._generation = generation || 0
+        this._generation = generation || 0
         this._maxGenerations = maxGenerations || 0
+
         this._left = 0
         this._top = 0
         this._width = 0
         this._height = 0
         this._right = this._left + this._width
         this._bottom = this._top + this._height
+
+        // if (!boundary) throw TypeError('boundary is a mandatory param');
+        // if (!(boundary instanceof Rectangle)) throw TypeError('boundary should be a Rectangle');
+        // this.boundary = boundary;
+
         //
         this._contents = []
-	}
+    }
 	// GETTERS
 	get parent() { return this._parent }
 	get children() { return this._children }

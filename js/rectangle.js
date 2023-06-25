@@ -27,6 +27,9 @@ class Rectangle {
     height === null ? this._height = bottom - top : this._height = height
     right === null ? this._right = left + width : this._right = right
     bottom === null ? this._bottom = top + height : this._bottom = bottom
+
+    this._midpoint = { x: this._left + (0.5*this._width),
+                       y: this._top + (0.5*this._height)}
   }
   // GETTERS
   get left() { return this._left }
@@ -35,18 +38,19 @@ class Rectangle {
   get height() { return this._height }
   get right() { return this._right }
   get bottom() { return this._bottom }
+  get midpoint() { return this._midpoint }
 	// SETTERS
-  set left( newLeft ) { 
-    this._left = newLeft
+  set left( number ) { 
+    this._left = number
     this._right = this._left + this._width }
-  set top( newTop ){ 
-    this._top = newTop
+  set top( number ){ 
+    this._top = number
     this._bottom = this._top + this._height }
-  set width( newWidth ) {
-    this._width = newWidth
+  set width( number ) {
+    this._width = number
     this._right = this._left + this._width }
-  set height( newHeight ) {
-    this._height = newHeight
+  set height( number ) {
+    this._height = number
     this._bottom = this._top + this._height }
 
   contains(point) {
