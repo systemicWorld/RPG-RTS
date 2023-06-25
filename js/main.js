@@ -11,7 +11,7 @@ function _main_(){
 	let cHeight = canvas.height = window.innerHeight // canvas set to inner height of window
 	let ctx = canvas.getContext("2d")
 
-	let terrain = new Terrain( .75 * cWidth, .5 * cHeight )
+	let terrain = new Terrain( 1.0 * cWidth, 1.0 * cHeight )
 	let agents = [] // agents seperate from gameObjects due to a lot of interactions?
 	//let gameObjects = []
 
@@ -19,7 +19,7 @@ function _main_(){
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 2 )
+	gamey.distributeAgents( utils, agents, terrain, 300 )
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 
@@ -38,15 +38,12 @@ function _main_(){
 		player.age = 21
 		camera.center( player.x , player.y )
 	
-		//gamey.mateBehavior ( gamey )
-	
 		//badguy.color = 'red'
 		/* QuadTree */
-		quadTree = new QuadTree(2)
+		quadTree = new QuadTree(3)
 		quadTree.width = terrain.width
 		quadTree.height = terrain.height
-		quadTree.addGeneration()
-		quadTree.children[1].addGeneration()
+		quadTree.addGenerations(2)
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
@@ -72,7 +69,7 @@ function _main_(){
 		}
 		{
 			if( keyboard.pressedKeys.fire ){
-				gamey.fireProjectile(bullets)
+				gamey.fireProjectile( bullets, player )
 			}
 		}
 
@@ -100,24 +97,24 @@ function _main_(){
 			}
 		}
 		// Do AI
-		//badguy.avoid( player, SECONDS_PER_TICK )
-		//badguy.seek( player, SECONDS_PER_TICK )
 		for( let i = 1; i < agents.length; i++ ) {
 			// agents[i].avoid( player, SECONDS_PER_TICK )
 			// agents[i].bond(SECONDS_PER_TICK)
 			agents[i].act(player, SECONDS_PER_TICK)
 		}
-		bullets.forEach( b => { b.move(dTime) })
+		bullets.forEach( i => { i.move( dTime ) })
 
-		//quadTree.intersecting(ctx, camera, viewport )
 		for( let i = 0, agent = {}; i < agents.length; i++ ){
 			agent = agents[i]
 			agent.nearby = []
 			quadTree.insert( agent )
 		}
-		// console.log(`return of getIns(): ${quadTree.getInsertions( player )}`)
 		player.nearby = quadTree.getInsertions( player )
 		player.checkIntersections() // turn touched red
+
+		bullets.forEach(( i )=>{
+			i.checkIntersections( quadTree.getInsertions( i ) )
+		})
 
 		/* CAMERA ///////////////////////////////////////////////
 		// Adjust at end to determine what's an intersting view

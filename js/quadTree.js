@@ -46,7 +46,7 @@ class QuadTree {
     set contents( array ) { this._contents = array }
 	// METHODS
 	addGeneration() {
-		console.info(`createNewGeneration()`)
+		// console.info(`createNewGeneration()`)
     	if( this.children.length ) return console.error(`Didn't create new generation! Quad already has ${this.children.length} children.`)
         if ( this.generation >= this.maxGenerations ) return console.error(`Didn't create new gernation! Maximum generatations set to ${this.maxGenerations}.` )
 
@@ -65,9 +65,31 @@ class QuadTree {
                 this.children.push( newQuad )
             }
         }
-        console.log(`Children created: ${this.children.length}, generation: ${generationNumber}`)
+        // console.log(`Children created: ${this.children.length}, generation: ${generationNumber}`)
 	}
-    
+    addGenerations( depth=2 ) {
+        // console.log(`addGenerations()`)
+        if( depth < 1 ) return console.error(`Depth must be greater than zero`)
+        if( this.children.length ) return console.error(`Didn't create new generation! Quad already has ${this.children.length} children.`)
+        if( this.generation >= this.maxGenerations ) return console.error(`Didn't create new gernation! Maximum generatations set to ${this.maxGenerations}.` )
+
+        let generationNumber = 1 + this.generation
+        let halfWidth = 0.5 * this.width
+        let halfHeight = 0.5 * this.height
+        let newQuad = {}
+
+        for ( let i = 0; i < 2; i++ ){
+            for ( let k = 0; k < 2; k++ ){
+                newQuad = new QuadTree( this.maxGenerations, this, generationNumber ) 
+                newQuad.left = (k % 2 * halfWidth) + this.left
+                newQuad.top = (i % 2 * halfHeight) + this.top
+                newQuad.width = halfWidth
+                newQuad.height = halfHeight
+                this.children.push( newQuad )
+                newQuad.addGenerations( depth-1 )
+            }
+        }
+    }
     print(){
         console.info(`Quad info: Left:${this.left}, Top:${this.top}, Width:${this.width}, Height:${this.height}`)
     }
@@ -102,7 +124,7 @@ class QuadTree {
             let b = agent.bottom
             //  0  1 quads
             //  2  3 quads
-            //   0   folds
+            //   0   folds.. folds come in handy for tracking over laps.. implement later.
             //  3+1  folds
             //   2   folds
             if( r < cW && b < cH ){ 

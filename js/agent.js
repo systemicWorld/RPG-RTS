@@ -57,6 +57,7 @@ class Agent{
 	get right() { return this._right }
 	get bottom() { return this._bottom }
 	get nearby() { return this._nearby }
+	get highlight() { return this._highlight }
 	get mate() { return this._mate }
 	get age() { return this._age }
 	get mother() { return this._mother }
@@ -189,7 +190,7 @@ class Agent{
 		//console.info(`checkIntersections()`)
 		if ( testSet.length == 0 ) return
 		
-		console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
+		// console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
 
 		let r = this._radius
 		let minimumDistance = r // + agent[i].radius

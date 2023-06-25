@@ -1,4 +1,4 @@
-class Rectangle {
+class Rectangle2 {
   constructor(x, y, width, height) {
     this.x = x;
     this.y = y;
