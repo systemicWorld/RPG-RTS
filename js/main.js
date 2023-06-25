@@ -115,7 +115,7 @@ function _main_(){
 			agent.nearby = []
 			quadTree.insert( agent )
 		}
-		console.log(`return of getIns(): ${quadTree.getInsertions( player )}`)
+		// console.log(`return of getIns(): ${quadTree.getInsertions( player )}`)
 		player.nearby = quadTree.getInsertions( player )
 		player.checkIntersections() // turn touched red
 

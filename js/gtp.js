@@ -21,7 +21,7 @@ class Rectangle {
   }
 }
 
-class QuadTree {
+class aiTree {
   constructor(boundary, capacity) {
     if (!boundary) throw TypeError('boundary is a mandatory param');
     if (!(boundary instanceof Rectangle)) throw TypeError('boundary should be a Rectangle');
@@ -34,7 +34,7 @@ class QuadTree {
 
   insert(gameObject) {
     if (!this.boundary.contains(gameObject.position)) {
-      return false; // object cannot be added to the quadtree
+      return false; // object cannot be added to the aiTree
     }
 
     if (this.gameObjects.length < this.capacity) {
@@ -56,11 +56,11 @@ class QuadTree {
     const { x, y, width, height } = this.boundary;
     const halfWidth = width / 2;
     const halfHeight = height / 2;
-
-    this.northEast = new QuadTree(new Rectangle(x + halfWidth, y - halfHeight, halfWidth, halfHeight), this.capacity);
-    this.northWest = new QuadTree(new Rectangle(x - halfWidth, y - halfHeight, halfWidth, halfHeight), this.capacity);
-    this.southEast = new QuadTree(new Rectangle(x + halfWidth, y + halfHeight, halfWidth, halfHeight), this.capacity);
-    this.southWest = new QuadTree(new Rectangle(x - halfWidth, y + halfHeight, halfWidth, halfHeight), this.capacity);
+    // constructor(x, y, width, height)
+    this.northEast = new aiTree(new Rectangle(x + halfWidth, y - halfHeight, halfWidth, halfHeight), this.capacity);
+    this.northWest = new aiTree(new Rectangle(x - halfWidth, y - halfHeight, halfWidth, halfHeight), this.capacity);
+    this.southEast = new aiTree(new Rectangle(x + halfWidth, y + halfHeight, halfWidth, halfHeight), this.capacity);
+    this.southWest = new aiTree(new Rectangle(x - halfWidth, y + halfHeight, halfWidth, halfHeight), this.capacity);
 
     this.divided = true;
   }

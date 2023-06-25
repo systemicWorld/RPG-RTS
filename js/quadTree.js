@@ -148,7 +148,7 @@ class QuadTree {
     }    
     
     getInsertions( agent, ins=[] ){
-        console.log(`getInsertions(), ${this.generation}`)
+        // console.log(`getInsertions(), ${this.generation}`)
         if( this.children.length ){
             let cW = 0.5 * this.width + this.left
             let cH = 0.5 * this.height + this.top
