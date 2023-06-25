@@ -11,20 +11,23 @@ function _main_(){
 	let cHeight = canvas.height = window.innerHeight // canvas set to inner height of window
 	let ctx = canvas.getContext("2d")
 
-	let terrain = new Terrain( .75 * cWidth, .5 * cHeight )
+	// let terrain = new Terrain( 1.0 * cWidth, 1.0 * cHeight )
+
+	let terrain = new Terrain( new Rectangle(0,0,1.0 * cWidth, 1.0 * cHeight ) )
 	let agents = [] // agents seperate from gameObjects due to a lot of interactions?
 	//let gameObjects = []
 
-	let viewport = new Viewport( 0, 0, cWidth+100, cHeight+70 )
+	let viewport = new Viewport( 0, 0, cWidth, cHeight )
 	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 21 )
+	gamey.distributeAgents( utils, agents, terrain, 300 )
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 
 	let bullets = []
 
+	let quadTree = {}
 	setup_game()
 	function setup_game(){
 		console.log(`setup_game()`)
@@ -37,15 +40,17 @@ function _main_(){
 		player.age = 21
 		camera.center( player.x , player.y )
 	
-		//gamey.mateBehavior ( gamey )
-	
 		//badguy.color = 'red'
+		/* QuadTree */
+		quadTree = new QuadTree( 0,0,terrain.width, terrain.height, 3)
+		quadTree.width = terrain.width
+		quadTree.height = terrain.height
+		quadTree.addGenerations(2)
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
 		// update the state of the world based on determined time step
 		// dont update if player wants pause
-		
 		if ( keyboard.pressedKeys.menu ) { // escape key pressed === true
 			menu.show()
 		}
@@ -66,53 +71,59 @@ function _main_(){
 		}
 		{
 			if( keyboard.pressedKeys.fire ){
-				gamey.fireProjectile(bullets)
+				gamey.fireProjectile( bullets, player )
 			}
 		}
 
-		{ // this block is for testing purposes.. allow put the player anywhere instantly with RIGHT click
-			// if( mouse.pressedButtons.right ) {
-			// 	// move the player to click coordinate
-			// 	player.y = mouse.y+camera.top
-			// 	player.x = mouse.x+camera.left
-			// }
+		{ 
 			while ( mouse.buffer.length > 0 ){
 				switch( mouse.buffer.shift() ) {
 					case `left`:
-						console.log(`left click`)
-						// player.y = mouse.y+camera.top
-						// player.x = mouse.x+camera.left
-						let xy = {x: mouse.x+camera.left, y: mouse.y+camera.top}
-						// gamey.createAgentAtLoc(utils, agents, xy)
+						// console.log(`left click`)
+						player.y = mouse.y+camera.top
+						player.x = mouse.x+camera.left
 						gamey.createAgentNextToAgent( utils, agents, agents[0] )
 						break;
 					case `middle`:
-						console.log(`mid click`)
+						// console.log(`mid click`)
 						break;
 					case `right`:
-						console.log(`right click`)
+						// console.log(`right click`)
+						// move the player to click coordinate
+						player.y = mouse.y+camera.top
+						player.x = mouse.x+camera.left
 						break;
 					default:
-						console.error(`unspecific click`)
+						console.error(`undefined button clicked`)
 				}
 			}
 		}
 		// Do AI
-		//badguy.avoid( player, SECONDS_PER_TICK )
-		//badguy.seek( player, SECONDS_PER_TICK )
 		for( let i = 1; i < agents.length; i++ ) {
 			// agents[i].avoid( player, SECONDS_PER_TICK )
 			// agents[i].bond(SECONDS_PER_TICK)
 			agents[i].act(player, SECONDS_PER_TICK)
 		}
-		bullets.forEach( b => { b.move(dTime)
-			
+		bullets.forEach( i => { i.move( dTime ) })
+
+		for( let i = 0, agent = {}; i < agents.length; i++ ){
+			agent = agents[i]
+			agent.nearby = []
+			quadTree.insert( agent )
+		}
+		player.nearby = quadTree.getInsertions( player )
+		player.checkIntersections() // turn touched red
+
+		bullets.forEach(( i )=>{
+			i.checkIntersections( quadTree.getInsertions( i ) )
 		})
+
 		/* CAMERA ///////////////////////////////////////////////
 		// Adjust at end to determine what's an intersting view
 		// Rule 1: Player never leaves the view
 		///////////////////////////////////////////////////////*/
 		camera.nearEdgeAsymptotic( player.x, player.y, terrain.width, terrain.height )
+		quadTree.clear()
 	}
 
 	function display_game( ) { // FPS is throttled, and there's no interpolation
@@ -135,8 +146,44 @@ function _main_(){
 		//console.log("Objects drawn on cam: "+gameObjectsOnCamera.length)
 		//camera.draw( ctx ) // draw bounding box for debug purposes
 		//viewport.draw( ctx )
+		quadTree.drawDeep( ctx, camera, viewport )
 	}
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	function panic(){
 		console.error("panic()")

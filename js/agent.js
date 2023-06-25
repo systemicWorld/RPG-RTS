@@ -2,7 +2,7 @@ class Agent{
 	constructor( gameID, x, y, radius, speed, color ){
 		this._id = gameID || NaN
 
-		this._radius = Math.abs( radius ) || 1
+		this._radius = radius * 10|| 1
 
 		this._x = x || 0 // 0 is farthest left in game world
 		this._y = y || 0 // 0 is highest up in game world
@@ -11,15 +11,19 @@ class Agent{
 		1.34 for females under 30
 		leg length and mass
 		age, sex, size, fitness */
-		this._speed = speed * 8 + (radius*2) || 1 // meters per second (10px per meter) // taller people walk faster
+		this._speed = speed * 18 + (radius*2) || 1 // meters per second (10px per meter) // taller people walk faster
 		this._color = color || 'yellow' // draw color
 		this._secondColor = color
+		this._highlight = false
 
 		// Bounding Box
 		this._left = this._x - this._radius
 		this._top = this._y - this._radius
 		this._right = this._x + this._radius
 		this._bottom = this._y + this._radius
+
+		// quadtree interaction
+		this._nearby = [] // the contents of the quadTree quad this agent is in
 
 		// narrative properties
 		this._sex = 0 // zero is female
@@ -52,24 +56,25 @@ class Agent{
 	get top() { return this._top }
 	get right() { return this._right }
 	get bottom() { return this._bottom }
+	get nearby() { return this._nearby }
+	get highlight() { return this._highlight }
 	get mate() { return this._mate }
 	get age() { return this._age }
 	get mother() { return this._mother }
 	get pregnant() { return this._pregnant }
 	// Setters
-	set id( id ){
-		this._id = id
-	}
+	set id( id ){ this._id = id }
 	set x( x ) {
 		this._x = x
 		this._left = x - this._radius
-		this._right = x - this._radius
+		this._right = x + this._radius
 	}
 	set y( y ) {
 		this._y = y
 		this._top = y - this._radius
 		this._bottom = y + this._radius
 	}
+	set left( left ) { this.x = left+this._radius }
 	set radius( radius ){
 		this._radius = radius
 		this._left = this._x - radius
@@ -77,9 +82,8 @@ class Agent{
 		this._right = this._x + radius
 		this._bottom = this._y + radius
 	}
-	set speed( speed ){
-		this._speed = speed
-	}
+	set speed( speed ){ this._speed = speed }
+	set nearby ( quadContents ){ this._nearby = quadContents }
 	/**
    * @param {any} string
    */
@@ -89,6 +93,10 @@ class Agent{
 	set secondColor( string ){
 		this._secondColor = string // CSS colors, or RGB[A]() string
 	}
+	/**
+	 * @param {boolean} bool
+	 */
+	set highlight ( bool ) { this._highlight = bool }
 	set sex( bool ){
 		//console.info(`sex(${bool})`)
 		this._sex = bool
@@ -124,36 +132,36 @@ class Agent{
 			}
 	}
 	draw( ctx, camera, viewport ){
-    let drawOnCam = true
-    if ( this.onCam(camera) ){
-      ctx.fillStyle = this._color // change to gradient below
-    }else{ // for debug, camera rect' will be smaller than screen bounds
-      ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
-      drawOnCam = false
-    }
-    // Create a radial gradient
-	// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
-    //let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
+		let drawOnCam = true
+			if ( this.onCam(camera) ){
+			ctx.fillStyle = this._color // change to gradient below
+		} else { // for debug, camera rect' will be smaller than screen bounds
+			ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
+			drawOnCam = false
+		}
+		// Create a radial gradient
+		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
+		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
 
-	let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
-	let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
-	let rOutter = this._radius * 10 / viewport.aspectRatio
+		let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
+		let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
+		let rOutter = this._radius / viewport.aspectRatio
 
-	let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
+		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
 
-    // Add color stops
-    gradient.addColorStop(0.6, this._color)
-    gradient.addColorStop(1, this._secondColor)
-	ctx.fillStyle = gradient
+		// Add color stops
+		gradient.addColorStop(0.6, this._highlight ? `red` : this._color)
+		gradient.addColorStop(1, this._highlight ? `red`: this._secondColor)
+		ctx.fillStyle = gradient
 
-    // Define a circular path
-    ctx.beginPath()
-    // ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
-    ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
-    // Set the fill style and draw a circle
-    ctx.fill()
+		// Define a circular path
+		ctx.beginPath()
+		// ctx.arc(this._x, this._y, this._radius, 0 , 2 * Math.PI); // template code
+		ctx.arc(x0,	y0,	rOutter, 0 , 2 * Math.PI)
+		// Set the fill style and draw a circle
+		ctx.fill()
 
-    return drawOnCam
+		return drawOnCam
 	}
 	// Acts
 	seek( agent, dTime ){ // move toward gameObject
@@ -164,6 +172,7 @@ class Agent{
 	}
 
 	avoid( agent, dTime ) { // move away from gameObject
+		return
 		let avoidanceDistance = 50
 		let goX = agent.x
 		let goY = agent.y
@@ -174,6 +183,34 @@ class Agent{
 			let speed = this._speed * dTime
 			this.x -= Math.cos ( theta ) * speed
 			this.y -= Math.sin ( theta ) * speed
+		}
+	}
+
+	checkIntersections(testSet=this._nearby){
+		//console.info(`checkIntersections()`)
+		if ( testSet.length == 0 ) return
+		
+		// console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
+
+		let r = this._radius
+		let minimumDistance = r // + agent[i].radius
+		let x1 = this.x
+		let y1 = this.y
+		let distance = 0 // Math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
+		// intersection if distance is less than minimum
+		let agent = {}
+		for ( let i = 0; i < testSet.length; i++ ){
+			agent = testSet[i]
+
+			if( this.id != agent.id ){
+				distance = Math.sqrt( (agent.x - x1)**2 + (agent.y - y1)**2 )
+				minimumDistance = r + agent.radius
+				if( distance < minimumDistance ){
+					// intersecting
+					//console.log(`got something!`)
+					agent.highlight = true
+				}
+			}
 		}
 	}
 
@@ -243,5 +280,8 @@ class Agent{
 		console.log(`birth()`)
 
 		this._pregnant = false
+	}
+	print(){
+		console.info(`Agent..left:${this.left}, top:${this.top}, right:${this.right}`)
 	}
 }
