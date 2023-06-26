@@ -38,7 +38,7 @@ class Gamey {
 			agents.push(agent)
 			agent.id = agents.length
 			agent.age=30
-			loc = utils.randomXY( terrain )
+			loc = utils.randomXY( terrain.boundary )
 			agent.x=loc.x
 			agent.y=loc.y
 		}
@@ -175,7 +175,7 @@ array1.forEach(element => console.log(element));
 	fireProjectile ( bullets, player ) {
 		console.info(`fireProjectile()`)
 		// test one bullet
-		if(bullets.length>0)return
+		// if(bullets.length>0)return
 		let bullet = new Projectile(0,0)
 
 		bullets.push( bullet )

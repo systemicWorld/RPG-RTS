@@ -91,12 +91,16 @@ class Projectile{
 			ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
 			drawOnCam = false
 		}
+
+		const { left: viewLeft, top: viewTop } = viewport.boundary
+		const aR = viewport.aspectRatio
+
 		// Create a radial gradient
 		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
 		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
-		let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
-		let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
-		let rOutter = this._radius / viewport.aspectRatio
+		let x0 = ((this._x - camera.left) / aR) + viewLeft
+		let y0 = ((this._y - camera.top) / aR) + viewTop
+		let rOutter = this._radius / aR
 
 		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
 

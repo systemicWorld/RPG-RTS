@@ -31,18 +31,18 @@ class Agent{
 		this._age = 0 // years
 		this._mother // an older female agent..
 
-		this._allegiances = []
-		this._emotion
-		this._bloodPressure
-		this._fatReserves
-		this._glycogenReserves
-		this._hydration
+		// this._allegiances = []
+		// this._emotion
+		// this._bloodPressure
+		// this._fatReserves
+		// this._glycogenReserves
+		// this._hydration
 
-		// reproductive properties
-		this._pregnant = 0 // false
-		this._gestationProgress = 0 // no progress unless pregnant
-		this._gestationPeriod = 100
-		this._gestationSpeed = 10
+		// // reproductive properties
+		// this._pregnant = 0 // false
+		// this._gestationProgress = 0 // no progress unless pregnant
+		// this._gestationPeriod = 100
+		// this._gestationSpeed = 10
 
 	}
 	// Getters
@@ -139,13 +139,17 @@ class Agent{
 			ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
 			drawOnCam = false
 		}
+
+		const { left: viewLeft, top: viewTop } = viewport.boundary
+		const ar = viewport.aspectRatio
+
 		// Create a radial gradient
 		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
 		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
 
-		let x0 = ((this._x - camera.left) / viewport.aspectRatio) + viewport.left
-		let y0 = ((this._y - camera.top) / viewport.aspectRatio) + viewport.top
-		let rOutter = this._radius / viewport.aspectRatio
+		let x0 = ((this._x - camera.left) / ar ) + viewLeft
+		let y0 = ((this._y - camera.top) / ar ) + viewTop
+		let rOutter = this._radius / ar
 
 		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
 
@@ -190,7 +194,7 @@ class Agent{
 		//console.info(`checkIntersections()`)
 		if ( testSet.length == 0 ) return
 		
-		// console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
+		console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
 
 		let r = this._radius
 		let minimumDistance = r // + agent[i].radius

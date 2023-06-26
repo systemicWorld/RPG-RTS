@@ -49,9 +49,10 @@ class Utilities {
 		}
 	}
 
-	randomXY( boundingRectangle ){
-		return { x: Math.random() * boundingRectangle.width,
-				 y: Math.random() * boundingRectangle.height }
+	randomXY( boundary ){
+		const { left, top, width, height } = boundary
+		return { x: Math.random() * width + left,
+				 y: Math.random() * height + top }
 	}
 
 	randomSkinToneRGB(){

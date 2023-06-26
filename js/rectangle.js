@@ -1,6 +1,10 @@
+/**
+ * Represents a rectangle great for bounding.
+ * @class
+ */
 class Rectangle {
   /**
-   * Creates an instance of MyClass.
+   * Creates an instance of Rectangle.
    * @param {number} left
    * @param {number} top
    * @param {number} width
@@ -28,8 +32,8 @@ class Rectangle {
     right === null ? this._right = left + width : this._right = right
     bottom === null ? this._bottom = top + height : this._bottom = bottom
 
-    this._midpoint = { x: this._left + (0.5*this._width),
-                       y: this._top + (0.5*this._height)}
+    this._midpoint = { x: this._left+(0.5*this._width),
+                       y: this._top+(0.5*this._height)}
   }
   // GETTERS
   get left() { return this._left }
@@ -42,16 +46,20 @@ class Rectangle {
 	// SETTERS
   set left( number ) { 
     this._left = number
-    this._right = this._left + this._width }
+    this._right = this._left + this._width 
+    this._midpoint.x = this._left+(0.5*this._width) }
   set top( number ){ 
     this._top = number
-    this._bottom = this._top + this._height }
+    this._bottom = this._top + this._height
+    this._midpoint.y = this._top+(0.5*this._height) }
   set width( number ) {
     this._width = number
-    this._right = this._left + this._width }
+    this._right = this._left + this._width
+    this._midpoint.x= this._left+(0.5*this._width) }
   set height( number ) {
     this._height = number
-    this._bottom = this._top + this._height }
+    this._bottom = this._top + this._height
+    this._midpoint.y = this._top+(0.5*this._height) } 
 
   contains(point) {
     return (point.x >= this._left &&

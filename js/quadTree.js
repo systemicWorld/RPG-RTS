@@ -1,23 +1,28 @@
+/**
+ * Represents a rectangle that hold references to intersecting rectangles.
+ * @class
+ */
 class QuadTree {
-    constructor( maxGenerations, parent, generation) {
-        this._parent = parent || null
+    /**
+     * Creates an instance of QuadTree.
+     * @param {number} maxGenerations
+     * @param {number} parent
+     * @param {number} generation
+     * @param {Object} boundary
+     */
+    constructor(maxGenerations = 1, 
+                parent = null,
+                generation = null,
+                boundary) {
+        this._maxGenerations = maxGenerations
+        this._parent = parent
+        this._generation = generation
+
+        if (!boundary) throw TypeError('boundary is a mandatory param')
+		if (!(boundary instanceof Rectangle)) throw TypeError('boundary should be a Rectangle')
+		this._boundary = boundary
+
         this._children = []
-        //this._intersections = []
-        this._generation = generation || 0
-        this._maxGenerations = maxGenerations || 0
-
-        this._left = 0
-        this._top = 0
-        this._width = 0
-        this._height = 0
-        this._right = this._left + this._width
-        this._bottom = this._top + this._height
-
-        // if (!boundary) throw TypeError('boundary is a mandatory param');
-        // if (!(boundary instanceof Rectangle)) throw TypeError('boundary should be a Rectangle');
-        // this.boundary = boundary;
-
-        //
         this._contents = []
     }
 	// GETTERS
@@ -25,49 +30,41 @@ class QuadTree {
 	get children() { return this._children }
 	get generation() { return this._generation }
     get maxGenerations() { return this._maxGenerations }
-    get left() { return this._left }
-    get top() { return this._top }
-    get width() { return this._width }
-    get height() { return this._height }
-    get right() { return this._right }
-    get bottom() { return this._bottom }
+    get boundary() { return this._boundary }
     get contents() { return this._contents }
 	// SETTERS
 	set parent( newParent ) { this._parent = newParent }
 	set children( newChildren ) { this._children = newChildren }
 	set generation( int ) { this._generation = int }
     set maxGenerations( int ) { this._maxGenerations = int }
-    set left( newLeft ) { 
-        this._left = newLeft
-        this._right = this._left + this._width }
-    set top( newTop ){ 
-        this._top = newTop
-        this._bottom = this._top + this._height }
-    set width( newWidth ) {
-        this._width = newWidth
-        this._right = this._left + this._width }
-    set height( newHeight ) {
-        this._height = newHeight
-        this._bottom = this._top + this._height }
+    set boundary( boundary ){ 
+		if (!boundary) throw TypeError('boundary is a mandatory param')
+		if (!(boundary instanceof Rectangle)) throw TypeError('boundary should be a Rectangle')
+		this._boundary = boundary
+	}
     set contents( array ) { this._contents = array }
 	// METHODS
 	addGeneration() {
 		// console.info(`createNewGeneration()`)
-    	if( this.children.length ) return console.error(`Didn't create new generation! Quad already has ${this.children.length} children.`)
-        if ( this.generation >= this.maxGenerations ) return console.error(`Didn't create new gernation! Maximum generatations set to ${this.maxGenerations}.` )
+    	if( this.children.length ) return console.warn(`Didn't create new generation! Quad already has ${this.children.length} children.`)
+        if ( this.generation >= this.maxGenerations ) return console.warn(`Didn't create new gernation! Maximum generatations set to ${this.maxGenerations}.` )
+
+        const { left, top, width, height } = this.boundary
 
         let generationNumber = 1 + this.generation
-        let halfWidth = 0.5 * this.width
-        let halfHeight = 0.5 * this.height
+        let halfWidth = 0.5* width
+        let halfHeight = 0.5* height
         let newQuad = {}
 
         for ( let i = 0; i < 2; i++ ){
             for ( let k = 0; k < 2; k++ ){
-                newQuad = new QuadTree( this.maxGenerations, this, generationNumber ) 
-                newQuad.left = (k % 2 * halfWidth) + this.left
-                newQuad.top = (i % 2 * halfHeight) + this.top
-                newQuad.width = halfWidth
-                newQuad.height = halfHeight
+                newQuad = new QuadTree(this.maxGenerations,
+                                       this,
+                                       generationNumber,
+                                       new Rectangle((k % 2 * halfWidth) + left, 
+                                                     (i % 2 * halfHeight) + top,
+                                                     halfWidth, 
+                                                     halfHeight) ) 
                 this.children.push( newQuad )
             }
         }
@@ -79,19 +76,24 @@ class QuadTree {
         if( this.children.length ) return console.error(`Didn't create new generation! Quad already has ${this.children.length} children.`)
         if( this.generation >= this.maxGenerations ) return console.error(`Didn't create new gernation! Maximum generatations set to ${this.maxGenerations}.` )
 
+        const { left, top, width, height } = this.boundary
+
         let generationNumber = 1 + this.generation
-        let halfWidth = 0.5 * this.width
-        let halfHeight = 0.5 * this.height
+        let halfWidth = 0.5* width
+        let halfHeight = 0.5* height
         let newQuad = {}
 
         for ( let i = 0; i < 2; i++ ){
             for ( let k = 0; k < 2; k++ ){
-                newQuad = new QuadTree( this.maxGenerations, this, generationNumber ) 
-                newQuad.left = (k % 2 * halfWidth) + this.left
-                newQuad.top = (i % 2 * halfHeight) + this.top
-                newQuad.width = halfWidth
-                newQuad.height = halfHeight
+                newQuad = new QuadTree(this.maxGenerations,
+                                       this,
+                                       generationNumber,
+                                       new Rectangle((k % 2 * halfWidth) + left, 
+                                                     (i % 2 * halfHeight) + top,
+                                                     halfWidth, 
+                                                     halfHeight) ) 
                 this.children.push( newQuad )
+
                 newQuad.addGenerations( depth-1 )
             }
         }
@@ -100,20 +102,23 @@ class QuadTree {
         console.info(`Quad info: Left:${this.left}, Top:${this.top}, Width:${this.width}, Height:${this.height}`)
     }
     draw( ctx, camera, viewport ){
+        const { left, top, width, height } = this._boundary
+        const { left: viewLeft, top: viewTop } = viewport.boundary
+		const aR = viewport.aspectRatio
 		ctx.beginPath();
-		ctx.lineWidth = 1/ viewport.aspectRatio
+		ctx.lineWidth = 1/ aR
 		ctx.strokeStyle = "orange"
 		ctx.rect(
-			this._left+(-camera.left / viewport.aspectRatio) + viewport.left,
-			this._top+(-camera.top / viewport.aspectRatio) + viewport.top, 
-			this._width / viewport.aspectRatio,
-			this._height / viewport.aspectRatio );
+			left+(-camera.left / aR) + viewLeft,
+			top+(-camera.top / aR) + viewTop, 
+			width / aR,
+			height / aR );
 		ctx.stroke();
 	}
     drawDeep( ctx, camera, viewport ){
         this.draw( ctx, camera, viewport )
         if ( this.children.length > 0 ){
-            for(let i =0; i < 4; i++){
+            for( let i = 0; i < 4; i++ ){
                 this.children[i].drawDeep( ctx, camera, viewport )
             }
         }
@@ -122,52 +127,49 @@ class QuadTree {
     insert( agent ){
         //console.log('insert()')
         if( this.children.length ){
-            let cW = 0.5 * this.width + this.left
-            let cH = 0.5 * this.height + this.top
-            let l = agent.left
-            let r = agent.right
-            let t = agent.top
-            let b = agent.bottom
+            const quads = this.children
+            const { x, y } = this.boundary.midpoint
+            const { left: l, right: r, top: t, bottom: b } = agent
             //  0  1 quads
             //  2  3 quads
             //   0   folds.. folds come in handy for tracking over laps.. implement later.
             //  3+1  folds
             //   2   folds
-            if( r < cW && b < cH ){ 
+            if( r < x && b < y ){ 
                 // console.log(`top left`)
-                this.children[0].insert( agent )
-            } else if( l > cW && b < cH ){
+                quads[0].insert( agent )
+            } else if( l > x && b < y ){
                 // console.log(`top right`)
-                this.children[1].insert( agent )
-            } else if( r < cW && t > cH ){
+                quads[1].insert( agent )
+            } else if( r < x && t > y ){
                 // console.log(`bottom left`)
-                this.children[2].insert( agent )
-            } else if( l > cW && t > cH ){
+                quads[2].insert( agent )
+            } else if( l > x && t > y ){
                 // console.log(`bottom right`)
-                this.children[3].insert( agent )
-            } else if( l < cW && r > cW && b < cH ){
+                quads[3].insert( agent )
+            } else if( l < x && r > x && b < y ){
                 // console.log(`t fold`)
-                this.children[0].insert( agent )
-                this.children[1].insert( agent )
-                // this.childrenFolds[0].insert( agent )
-            } else if(( l < cW && r > cW && t > cH )) {
+                quads[0].insert( agent )
+                quads[1].insert( agent )
+                // quadsFolds[0].insert( agent )
+            } else if(( l < x && r > x && t > y )) {
                 // console.log(`b fold`)
-                this.children[2].insert( agent )
-                this.children[3].insert( agent )
-            } else if( t < cH && b > cH && r < cW ){
+                quads[2].insert( agent )
+                quads[3].insert( agent )
+            } else if( t < y && b > y && r < x ){
                 // console.log(`l fold`)
-                this.children[0].insert( agent )
-                this.children[2].insert( agent )
-            } else if( t < cH && b > cH && l > cW ){
+                quads[0].insert( agent )
+                quads[2].insert( agent )
+            } else if( t < y && b > y && l > x ){
                 // console.log(`r fold`)
-                this.children[1].insert( agent )
-                this.children[3].insert( agent )
+                quads[1].insert( agent )
+                quads[3].insert( agent )
             } else {
                 // console.log(`center`)
-                this.children[0].insert( agent )
-                this.children[1].insert( agent )
-                this.children[2].insert( agent )
-                this.children[3].insert( agent )
+                quads[0].insert( agent )
+                quads[1].insert( agent )
+                quads[2].insert( agent )
+                quads[3].insert( agent )
             }
         } else {
             // console.log(`depth:${this.generation}`)
@@ -178,47 +180,44 @@ class QuadTree {
     getInsertions( agent, ins=[] ){
         // console.log(`getInsertions(), ${this.generation}`)
         if( this.children.length ){
-            let cW = 0.5 * this.width + this.left
-            let cH = 0.5 * this.height + this.top
-            let l = agent.left
-            let r = agent.right
-            let t = agent.top
-            let b = agent.bottom
+            const quads = this.children
+            const { x, y } = this.boundary.midpoint
+            const { left: l, right: r, top: t, bottom: b } = agent
             //  0  1
             //  2  3
-            if( r < cW && b < cH ){
-                ins.push( ...this.children[0].getInsertions( agent ) )
-            } else if( l > cW && b < cH ){
+            if( r < x && b < y ){
+                ins.push( ...quads[0].getInsertions( agent ) )
+            } else if( l > x && b < y ){
                 // console.log(`top right`)
-                ins.push( ...this.children[1].getInsertions( agent ) )
-            } else if( r < cW && t > cH ){
+                ins.push( ...quads[1].getInsertions( agent ) )
+            } else if( r < x && t > y ){
                 // console.log(`bottom left`)
-                ins.push( ...this.children[2].getInsertions( agent ) )
-            } else if( l > cW && t > cH ){
+                ins.push( ...quads[2].getInsertions( agent ) )
+            } else if( l > x && t > y ){
                 // console.log(`bottom right`)
-                ins.push( ...this.children[3].getInsertions( agent ) )
-            } else if( l < cW && r > cW && b < cH ){
+                ins.push( ...quads[3].getInsertions( agent ) )
+            } else if( l < x && r > x && b < y ){
                 // console.log(`t fold`)
-                ins.push( ...this.children[0].getInsertions( agent ) )
-                ins.push( ...this.children[1].getInsertions( agent ) )
-            } else if(( l < cW && r > cW && t > cH )) {
+                ins.push( ...quads[0].getInsertions( agent ) )
+                ins.push( ...quads[1].getInsertions( agent ) )
+            } else if(( l < x && r > x && t > y )) {
                 // console.log(`b fold`)
-                ins.push( ...this.children[2].getInsertions( agent ) )
-                ins.push( ...this.children[3].getInsertions( agent ) )
-            } else if( t < cH && b > cH && r < cW ){
+                ins.push( ...quads[2].getInsertions( agent ) )
+                ins.push( ...quads[3].getInsertions( agent ) )
+            } else if( t < y && b > y && r < x ){
                 // console.log(`l fold`)
-                ins.push( ...this.children[0].getInsertions( agent ) )
-                ins.push( ...this.children[2].getInsertions( agent ) )
-            } else if( t < cH && b > cH && l > cW ){
+                ins.push( ...quads[0].getInsertions( agent ) )
+                ins.push( ...quads[2].getInsertions( agent ) )
+            } else if( t < y && b > y && l > x ){
                 // console.log(`r fold`)
-                ins.push( ...this.children[1].getInsertions( agent ) )
-                ins.push( ...this.children[3].getInsertions( agent ) )
+                ins.push( ...quads[1].getInsertions( agent ) )
+                ins.push( ...quads[3].getInsertions( agent ) )
             } else {
                 // console.log(`center`)
-                ins.push( ...this.children[0].getInsertions( agent ) )
-                ins.push( ...this.children[1].getInsertions( agent ) )
-                ins.push( ...this.children[2].getInsertions( agent ) )
-                ins.push( ...this.children[3].getInsertions( agent ) )
+                ins.push( ...quads[0].getInsertions( agent ) )
+                ins.push( ...quads[1].getInsertions( agent ) )
+                ins.push( ...quads[2].getInsertions( agent ) )
+                ins.push( ...quads[3].getInsertions( agent ) )
             }
         } else {
             if( this.contents.length ){
