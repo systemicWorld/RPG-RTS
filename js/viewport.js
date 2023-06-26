@@ -12,8 +12,7 @@ class Viewport {
 		if (!(boundary instanceof Rectangle)) throw TypeError('boundary should be a Rectangle')
 		this._boundary = boundary
 
-		//
-		this._aspectRatio = 1 // viewport size is multipled by AR to get camera size
+		this._aspectRatio = 1 // viewport size is multipled by aR to get camera size
 	}
 	// Getters
 	get boundary() { return this._boundary }

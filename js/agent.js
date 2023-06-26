@@ -1,11 +1,11 @@
 class Agent{
-	constructor( gameID, x, y, radius, speed, color ){
+	constructor( gameID, x = 0, y = 0, radius, speed, color ){
 		this._id = gameID || NaN
 
-		this._radius = radius * 10|| 1
+		this._radius = radius * 10 || 1
 
-		this._x = x || 0 // 0 is farthest left in game world
-		this._y = y || 0 // 0 is highest up in game world
+		this._x = x  // 0 is farthest left in game world
+		this._y = y  // 0 is highest up in game world
 		
 		/* Average human speed is 1.36 meters/second for males under 30
 		1.34 for females under 30
@@ -15,13 +15,11 @@ class Agent{
 		this._color = color || 'yellow' // draw color
 		this._secondColor = color
 		this._highlight = false
-
-		// Bounding Box
-		this._left = this._x - this._radius
-		this._top = this._y - this._radius
-		this._right = this._x + this._radius
-		this._bottom = this._y + this._radius
-
+		
+		this._boundary = new Rectangle(x - this._radius,
+																	 y - this._radius,
+																	 this._radius*2,
+																	 this._radius*2)
 		// quadtree interaction
 		this._nearby = [] // the contents of the quadTree quad this agent is in
 
@@ -52,10 +50,7 @@ class Agent{
 	get radius() { return this._radius }
 	get speed() { return this._speed }
 	get sex() { return this._sex }
-	get left() { return this._left }
-	get top() { return this._top }
-	get right() { return this._right }
-	get bottom() { return this._bottom }
+	get boundary() { return this._boundary }
 	get nearby() { return this._nearby }
 	get highlight() { return this._highlight }
 	get mate() { return this._mate }
@@ -66,21 +61,19 @@ class Agent{
 	set id( id ){ this._id = id }
 	set x( x ) {
 		this._x = x
-		this._left = x - this._radius
-		this._right = x + this._radius
+		this._boundary.left = x - this._radius
 	}
 	set y( y ) {
 		this._y = y
-		this._top = y - this._radius
-		this._bottom = y + this._radius
+		this._boundary.top = y - this._radius
 	}
-	set left( left ) { this.x = left+this._radius }
 	set radius( radius ){
 		this._radius = radius
-		this._left = this._x - radius
-		this._top = this._y - radius
-		this._right = this._x + radius
-		this._bottom = this._y + radius
+		const { x, y } = this._boundary._midpoint
+		this._boundary = new Rectangle(x - radius,
+																	 y - radius,
+																	 radius*2,
+																	 radius*2)
 	}
 	set speed( speed ){ this._speed = speed }
 	set nearby ( quadContents ){ this._nearby = quadContents }
@@ -117,15 +110,15 @@ class Agent{
 	// Methods
 	act( player, dTime ){
 		// console.info(`act()`)
-
 		this.avoid(player, dTime)
 	}
 	onCam ( camera ){
 			// check if within camera bounds
-			if( this._top > camera.bottom ||
-				this._right < camera.left ||
-				this._bottom < camera.top ||
-				this._left > camera.right ){
+			const { left, top, right, bottom } = this._boundary
+			if(top > camera.bottom ||
+				 right < camera.left ||
+				 bottom < camera.top ||
+				 left > camera.right ){
 				return false
 			}else{
 				return true
@@ -141,15 +134,15 @@ class Agent{
 		}
 
 		const { left: viewLeft, top: viewTop } = viewport.boundary
-		const ar = viewport.aspectRatio
+		const aR = viewport.aspectRatio
 
 		// Create a radial gradient
 		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
 		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
 
-		let x0 = ((this._x - camera.left) / ar ) + viewLeft
-		let y0 = ((this._y - camera.top) / ar ) + viewTop
-		let rOutter = this._radius / ar
+		let x0 = ((this._x - camera.left) / aR ) + viewLeft
+		let y0 = ((this._y - camera.top) / aR ) + viewTop
+		let rOutter = this._radius / aR
 
 		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
 

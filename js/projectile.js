@@ -1,31 +1,31 @@
+/**
+ * A projectile like a bullet
+ * @class 
+ */
 class Projectile{
-	constructor( x, y ){
-		this._radius = 10
+	constructor( x = 0, y = 0, radius = 1 ){
+		this._x = x // 0 is farthest left in game world
+		this._y = y // 0 is highest up in game world
+		this._radius = radius
 
-		this._x = x || 0 // 0 is farthest left in game world
-		this._y = y || 0 // 0 is highest up in game world
-		
+		this._boundary = new Rectangle(x - radius,
+																	 y - radius,
+																	 this._radius*2,
+																	 this._radius*2)
+
 		/* Sound barrier at sea level: 343 meters/second 
         barrel length, bullet weight, powder weight*/
-		this._speed = 1 // meters per second (10px per meter)
+		this._speed = 0.10 // meters per second (10px per meter)
 		this._color = 'red' // paint color
 		this._secondColor = `blue`
-
-		this._vector = 0
 
 		this._vX = 0
 		this._vY = 0
 
-		// Bounding Box
-		this._left = this._x - this._radius
-		this._top = this._y - this._radius
-		this._right = this._x + this._radius
-		this._bottom = this._y + this._radius
-
 		// narrative properties
-        this._manufacturer
-        this._cartridgeMass
-        this._bulletMass
+		this._manufacturer
+		this._cartridgeMass
+		this._bulletMass
 		
 		// Impact ..
 		this._impact = false
@@ -35,38 +35,37 @@ class Projectile{
 	get y() { return this._y }
 	get radius() { return this._radius }
 	get speed() { return this._speed }
-	get left() { return this._left }
-	get top() { return this._top }
-	get right() { return this._right }
-	get bottom() { return this._bottom }
+	get boundary() { return this._boundary }
 	get impact() { return this._impact }
 	// Setters
 	set x( x ) {
 		this._x = x
-		this._left = x - this._radius
-		this._right = x - this._radius
+		this._boundary.left = x - this._radius
 	}
 	set y( y ) {
 		this._y = y
-		this._top = y - this._radius
-		this._bottom = y + this._radius
+		this._boundary.top = y - this._radius
 	}
 	set radius( radius ){
 		this._radius = radius
-		this._left = this._x - radius
-		this._top = this._y - radius
-		this._right = this._x + radius
-		this._bottom = this._y + radius
+		const { x, y } = this._boundary._midpoint
+		this._boundary = new Rectangle(x - radius,
+																	 y - radius,
+																	 radius*2,
+																	 radius*2)
 	}
 	set speed( speed ){ this._speed = speed }
 	/**
-   * @param {any} string
+   * @param {string} rbga - like: `rgba( r, b , g , a)`
    */
-	set color( string ){
-		this._color = string // CSS colors, or RGB[A]() string
+	set color( rbga ){
+		this._color = rbga // CSS colors, or RGB[A]() string
 	}
-	set secondColor( string ){
-		this._secondColor = string // CSS colors, or RGB[A]() string
+	/**
+   * @param {string} rbga - like: `rgba( r, b , g , a)`
+   */
+	set secondColor( rbga ){
+		this._secondColor = rbga // CSS colors, or RGB[A]() string
 	}
 	set impact( bool ){
 		this._impact = bool
@@ -74,10 +73,11 @@ class Projectile{
 	// Methods
 	onCam ( camera ){
 			// check if within camera bounds
-			if( this._top > camera.bottom ||
-				this._right < camera.left ||
-				this._bottom < camera.top ||
-				this._left > camera.right ){
+			const { left, top, right, bottom } = this._boundary
+			if(top > camera.bottom ||
+				 right < camera.left ||
+				 bottom < camera.top ||
+				 left > camera.right ){
 				return false
 			}else{
 				return true
@@ -88,7 +88,7 @@ class Projectile{
 		if( this.onCam(camera) ){
 			ctx.fillStyle = this._color // change to gradient below
 		}else{ // for debug, camera rect' will be smaller than screen bounds
-			ctx.fillStyle = "rgba(200,100,200,.5)" // off camera debugger
+			ctx.fillStyle = `rgba(200,100,200,.5)` // off camera debugger
 			drawOnCam = false
 		}
 
@@ -120,11 +120,8 @@ class Projectile{
 	}
 	// Acts
 	move( dTime ){
-		// this._x += .1*dTime * this.speed
-		// this._y += dTime * this._vector
-		// Calculate the final velocity components
-		this._x += this._vX// * dTime
-		this._y += this._vY //* dTime
+		this.x += this._vX * dTime
+		this.y += this._vY * dTime
 	}
 	fire( dX, dY ){
 		console.log(``)
@@ -150,23 +147,21 @@ class Projectile{
 		console.log(`bullet, nearby:${testSet.length}`)
 
 		let r = this._radius
-		let minimumDistance = r // + agent[i].radius
-		let x1 = this.x
-		let y1 = this.y
+		let minDistance = r // + agent[i].radius
+		let x1 = this._x
+		let y1 = this._y
 		let distance = 0 // Math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
 		// intersection if distance is less than minimum
 		let agent = {}
 		for ( let i = 0; i < testSet.length; i++ ){
 			agent = testSet[i]
 
-			if( this.id != agent.id ){
-				distance = Math.sqrt( (agent.x - x1)**2 + (agent.y - y1)**2 )
-				minimumDistance = r + agent.radius
-				if( distance < minimumDistance ){	
-					agent.highlight = true
-					this.impact = true
-					return
-				}
+			distance = Math.sqrt( (agent.x - x1)**2 + (agent.y - y1)**2 )
+			minDistance = r + agent.radius
+			if( distance < minDistance ){	
+				agent.highlight = true
+				this.impact = true
+				// return // return if single impact wanted
 			}
 		}
 	}

@@ -2,7 +2,7 @@ class Terrain {
 	constructor( boundary ) {
 		if (!boundary) throw TypeError('boundary is a mandatory param')
 		if (!(boundary instanceof Rectangle)) throw TypeError('boundary should be a Rectangle')
-		this._boundary = boundary;
+		this._boundary = boundary
 	}
 	// Getters
 	get boundary(){ return this._boundary }
@@ -16,7 +16,7 @@ class Terrain {
 	draw( ctx, camera, viewport ){
     const { left, top, width, height } = this._boundary
 		const { left: viewLeft, top: viewTop } = viewport.boundary
-		const ar = viewport.aspectRatio
+		const aR = viewport.aspectRatio
 	
 		// Create a radial gradient
 		let gradient = ctx.createRadialGradient(width / 2 - camera.left,
@@ -39,12 +39,12 @@ class Terrain {
 								 height)
 		
 		ctx.beginPath()
-		ctx.lineWidth = 3/ ar
+		ctx.lineWidth = 3/ aR
 		ctx.strokeStyle = "teal"
-		ctx.rect((-camera.left / ar) + viewLeft,
-						 (-camera.top / ar) + viewTop, 
-						 width / ar,
-						 height / ar )
+		ctx.rect((-camera.left / aR) + viewLeft,
+						 (-camera.top / aR) + viewTop, 
+						 width / aR,
+						 height / aR )
 		ctx.stroke()
 	}
 }
