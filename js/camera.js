@@ -1,5 +1,5 @@
 class Camera{
-	constructor( left, top, width, height ){
+	constructor( left=0, top=0, width, height ){
 		this._left = left
 		this._width = width
 		this._right = left + width

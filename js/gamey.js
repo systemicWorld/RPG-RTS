@@ -38,7 +38,7 @@ class Gamey {
 			agents.push(agent)
 			agent.id = agents.length
 			agent.age=30
-			loc = utils.randomXY( terrain )
+			loc = utils.randomXY( terrain.boundary )
 			agent.x=loc.x
 			agent.y=loc.y
 		}
@@ -122,7 +122,14 @@ class Gamey {
 		}
 		return females
 	}
-	getAllMales( population )  {
+	/**
+	 * Calculates the sum of two numbers.
+	 *
+	 * @param {Object[]} population - Array of Objects with a sex.
+	 * @param {bool} sex - 0 is female 1 is male.
+	 * @returns {Object[]} Array of Objects of the chosen sex.
+	 */
+	getAllMales( population, sex )  {
 		console.info( `getAllMales(population)` )
 		let males = []
 		let individual = population[0]
@@ -133,17 +140,6 @@ class Gamey {
 			}
 		}
 		return males
-		/*
-const array1 = ['a', 'b', 'c'];
-
-array1.forEach(element => console.log(element));
-
-// Expected output: "a"
-// Expected output: "b"
-// Expected output: "c"
-		let males = population.forEach(human => (human.sex == 1) ? males.push(human)} )
-		return males
-		*/
 	}
 	calcAverageRadius( circles ) {
 		console.info( `calcAverageRadius()` )
@@ -175,12 +171,9 @@ array1.forEach(element => console.log(element));
 	fireProjectile ( bullets, player ) {
 		console.info(`fireProjectile()`)
 		// test one bullet
-		if(bullets.length>0)return
-		let bullet = new Projectile(0,0)
-
+		// if( bullets.length > 0 ) return // debug
+		let bullet = new Projectile( 0, 0, 10 )
 		bullets.push( bullet )
-
-		// need a direction
 		bullet.fire( player.x, player.y )
 	}
 }

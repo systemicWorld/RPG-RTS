@@ -11,17 +11,16 @@ function _main_(){
 	let cHeight = canvas.height = window.innerHeight // canvas set to inner height of window
 	let ctx = canvas.getContext("2d")
 
-	// let terrain = new Terrain( 1.0 * cWidth, 1.0 * cHeight )
+	let terrain = new Terrain( new Rectangle( 0, 0, 1.05 * cWidth, 1.05 * cHeight ) );
 
-	let terrain = new Terrain( new Rectangle(0,0,1.0 * cWidth, 1.0 * cHeight ) )
 	let agents = [] // agents seperate from gameObjects due to a lot of interactions?
 	//let gameObjects = []
 
-	let viewport = new Viewport( 0, 0, cWidth, cHeight )
-	let camera = new Camera( 0, 0, viewport.width * viewport.aspectRatio, viewport.height * viewport.aspectRatio )
+	let viewport = new Viewport( new Rectangle( 0, 0, cWidth, cHeight ) )
+	let camera = new Camera( 0, 0, viewport.boundary.width * viewport.aspectRatio, viewport.boundary.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 300 )
+	gamey.distributeAgents( utils, agents, terrain, 100)
 	let player = agents[0]
 	//let badguy = gameOjbects[1]
 
@@ -39,13 +38,10 @@ function _main_(){
 		player.male = false // player = female = false
 		player.age = 21
 		camera.center( player.x , player.y )
-	
 		//badguy.color = 'red'
 		/* QuadTree */
-		quadTree = new QuadTree( 0,0,terrain.width, terrain.height, 3)
-		quadTree.width = terrain.width
-		quadTree.height = terrain.height
-		quadTree.addGenerations(2)
+		quadTree = new QuadTree( 3, undefined, 0, new Rectangle( 0, 0, terrain.boundary.width, terrain.boundary.height ) )
+		quadTree.addGenerations( 1 )
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
@@ -105,17 +101,18 @@ function _main_(){
 			agents[i].act(player, SECONDS_PER_TICK)
 		}
 		bullets.forEach( i => { i.move( dTime ) })
-
 		for( let i = 0, agent = {}; i < agents.length; i++ ){
 			agent = agents[i]
 			agent.nearby = []
 			quadTree.insert( agent )
 		}
-		player.nearby = quadTree.getInsertions( player )
+		player.nearby = quadTree.getInsertions( player.boundary )
 		player.checkIntersections() // turn touched red
-
+		// const { left: qL, right: qR } = quadTree.children[1].boundary
+		// const { left: pL, right: pR, width: pW } = player.boundary
+		// console.log(`intersection?: ${quadTree.children[1].boundary.intersects(player.boundary)}, qL vs pR: ${qL} vs ${pR}, pL:${pL}, pW:${pW}`)
 		bullets.forEach(( i )=>{
-			i.checkIntersections( quadTree.getInsertions( i ) )
+			i.checkIntersections( quadTree.getInsertions( i.boundary ) )
 		})
 
 		/* CAMERA ///////////////////////////////////////////////
@@ -126,14 +123,14 @@ function _main_(){
 		quadTree.clear()
 	}
 
-	function display_game( ) { // FPS is throttled, and there's no interpolation
+	function display_game( ) { // FPS is throttled by browsers, and there's no interpolation
 		// clear the screen
 		ctx.fillStyle = 'black'
 		ctx.fillRect( 0, 0, cWidth, cHeight )
 		// draw the state of the world // should be draw the state of what the camera bounds
 		terrain.draw( ctx, camera, viewport ) // non-performant??
 	
-    	let drawnObjects = []
+    let drawnObjects = []
 		for( let i = agents.length-1; i >= 0; i-- ) { // player is 0 so player gets drawn last/on top
 			if ( agents[i].draw( ctx, camera, viewport ) == true ) {
 				drawnObjects.push(agents[i])
@@ -144,8 +141,8 @@ function _main_(){
 		}
 		gameObjectsOnCamera = drawnObjects
 		//console.log("Objects drawn on cam: "+gameObjectsOnCamera.length)
-		//camera.draw( ctx ) // draw bounding box for debug purposes
-		//viewport.draw( ctx )
+		// camera.draw( ctx ) // draw bounding box for debug purposes
+		// viewport.draw( ctx )
 		quadTree.drawDeep( ctx, camera, viewport )
 	}
 	
