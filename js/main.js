@@ -11,26 +11,26 @@ function _main_(){
 	let cHeight = canvas.height = window.innerHeight // canvas set to inner height of window
 	let ctx = canvas.getContext("2d")
 
+	let viewport = new Viewport( new Rectangle( 0, 0, cWidth, cHeight ) )
+	let camera = new Camera( 0, 0, viewport.boundary.width * viewport.aspectRatio, viewport.boundary.height * viewport.aspectRatio )
+
 	let terrain = new Terrain( new Rectangle( 0, 0, 1.05 * cWidth, 1.05 * cHeight ) );
 
 	let agents = [] // agents seperate from gameObjects due to a lot of interactions?
+	let player = {}
 	//let gameObjects = []
-
-	let viewport = new Viewport( new Rectangle( 0, 0, cWidth, cHeight ) )
-	let camera = new Camera( 0, 0, viewport.boundary.width * viewport.aspectRatio, viewport.boundary.height * viewport.aspectRatio )
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	gamey.distributeAgents( utils, agents, terrain, 100)
-	let player = agents[0]
-	//let badguy = gameOjbects[1]
-
 	let bullets = []
-
+	let stamps = []
 	let quadTree = {}
+
 	setup_game()
 	function setup_game(){
 		console.log(`setup_game()`)
-
+		gamey.distributeAgents( utils, agents, terrain, 100)
+		player = agents[0]
+		//let badguy = gameOjbects[1]
 		gamey.colorAgentsBySex( agents )
 		gamey.colorAgentsByAge( agents )
 	
@@ -42,6 +42,16 @@ function _main_(){
 		/* QuadTree */
 		quadTree = new QuadTree( 3, undefined, 0, new Rectangle( 0, 0, terrain.boundary.width, terrain.boundary.height ) )
 		quadTree.addGenerations( 1 )
+
+		// stamps.push( new Stamp(`pew`, new Rectangle(120,200,0,0), `rgba(250,0,0,1)`))
+		// stamps[0]._rotate=20 * 0.017453292519943295
+		// stamps[0].fontsize = 20
+		// stamps.push( new Stamp(`pew`, new Rectangle(150,250,0,0), `rgba(250,0,0,1)`))
+		// stamps[1]._rotate=10 * 0.017453292519943295
+		// stamps[1].fontsize = 20
+		// stamps.push( new Stamp(`pew!`, new Rectangle(190,200,0,0), `rgba(250,0,0,1)`))
+		// stamps[2]._rotate=40 * 0.017453292519943295
+		// stamps[2].fontsize = 40
 	}
 
 	function update_game( /*currently global SECONDS_PER_TICK*/) {
@@ -67,7 +77,7 @@ function _main_(){
 		}
 		{
 			if( keyboard.pressedKeys.fire ){
-				gamey.fireProjectile( bullets, player )
+				gamey.fireProjectile( bullets, player, stamps )
 			}
 		}
 
@@ -130,16 +140,50 @@ function _main_(){
 		// draw the state of the world // should be draw the state of what the camera bounds
 		terrain.draw( ctx, camera, viewport ) // non-performant??
 	
+		// // Save the current canvas state
+		// ctx.save();
+
+		// let textRBGA = `rgba(0,0,0,.5)`
+		// // Set the font properties
+		// ctx.font = '40px Arial';
+		// ctx.fillStyle = textRBGA;
+
+		// // Set the shadow properties
+		// ctx.shadowColor = 'rgba(220, 220, 220, 0.5)';
+		// ctx.shadowBlur = 5;
+		// ctx.shadowOffsetX = 2;
+		// ctx.shadowOffsetY = 2;
+
+		// let x0 = ((100 - camera.left) )// + viewLeft
+		// let y0 = ((200 - camera.top) ) //+ viewTop
+		// // let x0 = ((player.x - camera.left) )// + viewLeft
+		// // let y0 = ((player.y - camera.top) ) //+ viewTop
+		// // Translate to the desired position
+		// ctx.translate(x0, y0);
+		// // Rotate the canvas
+		// ctx.rotate(Math.PI / 3); // Rotate by 45 degrees (in radians)
+		// // Draw the text on the canvas
+		// ctx.fillText('BANG', 0, 0);
+		// // Restore the canvas state
+		// ctx.restore();
+
+
     let drawnObjects = []
 		for( let i = agents.length-1; i >= 0; i-- ) { // player is 0 so player gets drawn last/on top
 			if ( agents[i].draw( ctx, camera, viewport ) == true ) {
 				drawnObjects.push(agents[i])
 			}
 		}
+		gameObjectsOnCamera = drawnObjects
+		
 		for( let i = 0; i < bullets.length; i++){
 			bullets[i].draw( ctx, camera, viewport )
 		}
-		gameObjectsOnCamera = drawnObjects
+
+		for ( let i = 0; i < stamps.length; i++){
+			stamps[i].draw( ctx, camera, viewport )
+		}
+		
 		//console.log("Objects drawn on cam: "+gameObjectsOnCamera.length)
 		// camera.draw( ctx ) // draw bounding box for debug purposes
 		// viewport.draw( ctx )

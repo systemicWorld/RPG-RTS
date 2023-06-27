@@ -1,6 +1,9 @@
 // Functions the game uses that are beyond mere utility functions
 class Gamey {
-	createHuman( utils ) { 
+	constructor(){
+		this.utils = new Utilities()
+	}
+	createHuman( utils = this.utils ) { 
 		console.info(`createHuman()`)
 		let sex = utils.binary() // 1 = male
 		let radius = 1
@@ -29,7 +32,7 @@ class Gamey {
 		return human
 	}
 
-	distributeAgents( utils, agents, terrain, howMany ){
+	distributeAgents( utils = this.utils, agents, terrain, howMany ){
 		console.info("distributeAgents()")
 		let loc
 		let agent = this.createHuman(utils) // meh :/
@@ -48,7 +51,7 @@ class Gamey {
 		utils.descriptiveStatistics(malesRadaii)
 	}
 
-	createAgentAtLoc( utils, agents, coords ){
+	createAgentAtLoc( utils = this.utils, agents, coords ){
 		console.info(`createAgentAtLoc(gameID??)`)
 		let agent = this.createHuman(utils)
 		agent.x = coords.x
@@ -56,7 +59,7 @@ class Gamey {
 		agents.push( agent )
 	}
 
-	createAgentNextToAgent( utils, agents, agent ){
+	createAgentNextToAgent( utils = this.utils, agents, agent ){
 		console.info(`createAgentNextToAgent( utils{}, agents[], agent:${agent} )`)
 		let agentID = agents.length
 		let loc
@@ -168,12 +171,20 @@ class Gamey {
 		let percentIncrease = [(maleMean - femaleMean)/femaleMean] * 100
 		console.info(`incease: ${percentIncrease}`)// 
 	}
-	fireProjectile ( bullets, player ) {
+	fireProjectile ( bullets, player, stamps, utils = this.utils ) {
 		console.info(`fireProjectile()`)
 		// test one bullet
 		// if( bullets.length > 0 ) return // debug
 		let bullet = new Projectile( 0, 0, 10 )
 		bullets.push( bullet )
 		bullet.fire( player.x, player.y )
+
+
+		let p = utils.randomXY( new Rectangle(100,100,500,500) )
+		
+		let pew = new Stamp(`pew`, new Rectangle( p.x,p.y, 0, 0 ), `rgba(250,0,0,1)`)
+		stamps.push( pew )
+		pew._rotate= utils.gaussianRandom( 40, 20) * 0.017453292519943295
+		pew.fontsize = utils.gaussianRandom(20, 10)
 	}
 }
