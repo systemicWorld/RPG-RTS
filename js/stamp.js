@@ -77,13 +77,10 @@ class Stamp{
 		}
 	}
 	draw( dTime, ctx, camera, viewport ){
-		this._duration -= dTime
 		if(this._duration < 0){
 			return
 		}
-
-		// Save the current canvas state
-    ctx.save();
+		this._duration -= dTime
 
 		let drawOnCam = true
 			if ( this.onCam(camera) ){
@@ -93,6 +90,7 @@ class Stamp{
 			drawOnCam = false
 		}
 
+    ctx.save()
     // Set the font properties
     ctx.font = this._font
     ctx.fillStyle = this._color

@@ -3,7 +3,7 @@ class Gamey {
 	constructor(){
 		this.utils = new Utilities()
 	}
-	createHuman( utils = this.utils ) { 
+	createHuman( utils = this.utils ){ 
 		console.info(`createHuman()`)
 		let sex = utils.binary() // 1 = male
 		let radius = 1
@@ -132,7 +132,7 @@ class Gamey {
 	 * @param {bool} sex - 0 is female 1 is male.
 	 * @returns {Object[]} Array of Objects of the chosen sex.
 	 */
-	getAllMales( population, sex )  {
+	getAllMales( population, sex ) {
 		console.info( `getAllMales(population)` )
 		let males = []
 		let individual = population[0]
@@ -144,7 +144,7 @@ class Gamey {
 		}
 		return males
 	}
-	calcAverageRadius( circles ) {
+	calcAverageRadius( circles ){
 		console.info( `calcAverageRadius()` )
 		let sum = 0
 		for(let i = 0; i < circles.length; i++ ) {
@@ -153,7 +153,7 @@ class Gamey {
 		let mean = sum / circles.length
 		return mean
 	}
-	calcAverageAge( population ) {
+	calcAverageAge( population ){
 		console.info(`calcAverageAge()`)
 		let sum = 0
 		for( let i = 0; i < population.length; i++ ) {
@@ -162,7 +162,7 @@ class Gamey {
 		let mean = sum / population.length
 		return mean
 	}
-	findSizeIncrease( agents ) {
+	findSizeIncrease( agents ){
 		// Find average radius of males and females
 		let femaleMean = this.calcAverageRadius( this.getAllFemales(agents) )
 		console.info(`females mean radius: ${femaleMean}`)
@@ -171,16 +171,28 @@ class Gamey {
 		let percentIncrease = [(maleMean - femaleMean)/femaleMean] * 100
 		console.info(`incease: ${percentIncrease}`)// 
 	}
-	fireProjectile ( bullets, player, stamps, utils = this.utils ) {
+	preloadProjectiles( projectiles = [], length = 500 ){
+		console.info(`preloadProjectiles()`)
+
+		let projectile = {}
+		for( let i = 0; i < length; i++ ){
+			projectile = new Projectile( 0, 0, 10 )
+			projectiles.push( projectile )
+		}
+	}
+	fireProjectile ( bullets, player, stamps, utils = this.utils ){
 		// console.info(`fireProjectile()`)
-		// if( bullets.length > 0 ) return // debug // test one bullet
-		let bullet = new Projectile( 0, 0, 10 )
-		bullets.push( bullet )
-		bullet.fire( player.x, player.y )
+		let bullet = {}
+		for( let i = 0; i < bullets.length; i++ ){
+			bullet = bullets[i]
+			if( !bullet._active ){
+				bullet.fire( player.x, player.y )
+				break
+			}
+		}
 
-		let p = utils.randomXY( new Rectangle(100,100,500,500) )
-
-		let pew = new Stamp( `pew`, new Rectangle( p.x,p.y, 0, 0 ), `rgb(250,0,0)`, 1000 )
+		const p = utils.randomXY( new Rectangle(100,100,500,500))
+		let pew = new Stamp( `pew`, new Rectangle( p.x,p.y, 0, 0 ), `rgb(250,0,0)`, 10 )
 		stamps.push( pew )
 		pew._rotate= utils.gaussianRandom( 40, 20) * 0.017453292519943295
 		pew.fontsize = utils.gaussianRandom(20, 10)

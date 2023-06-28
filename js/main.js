@@ -21,13 +21,14 @@ function _main_(){
 	//let gameObjects = []
 	//let gameObjectsOnCamera = [] // good for debugging
 
-	let bullets = []
+	let projectiles = [] // never get added to the quadTree with agents
 	let stamps = []
 	let quadTree = {}
 
 	setup_game()
 	function setup_game(){
 		console.log(`setup_game()`)
+		gamey.preloadProjectiles( projectiles, 500 ) // 500 seems good to start
 		gamey.distributeAgents( utils, agents, terrain, 100)
 		player = agents[0]
 		//let badguy = gameOjbects[1]
@@ -69,7 +70,7 @@ function _main_(){
 						player.vX = player._speed
 						break
 					case `fire`:
-						gamey.fireProjectile( bullets, player, stamps )
+						gamey.fireProjectile( projectiles, player, stamps )
 						break
 				}
 			}else if( event.type == `keyup`){
@@ -109,25 +110,29 @@ function _main_(){
 		}
 	
 		// Do AI
-		for( let i = 0; i < agents.length; i++ ) {
+		for( let i = 0; i < agents.length; i++ ){
 			// agents[i].avoid( player, SECONDS_PER_TICK )
 			// agents[i].bond(SECONDS_PER_TICK)
 			agents[i].act( player, SECONDS_PER_TICK )
 		}
 
-		bullets.forEach( i => { i.move( SECONDS_PER_TICK ) })
 		for( let i = 0, agent = {}; i < agents.length; i++ ){
 			agent = agents[i]
 			agent.nearby = []
 			quadTree.insert( agent )
 		}
+
 		player.nearby = quadTree.getInsertions( player.boundary )
 		player.checkIntersections() // turn touched red
-		// const { left: qL, right: qR } = quadTree.children[1].boundary
-		// const { left: pL, right: pR, width: pW } = player.boundary
-		// console.log(`intersection?: ${quadTree.children[1].boundary.intersects(player.boundary)}, qL vs pR: ${qL} vs ${pR}, pL:${pL}, pW:${pW}`)
-		bullets.forEach(( i )=>{
-			i.checkIntersections( quadTree.getInsertions( i.boundary ) )
+
+		projectiles.forEach(( i )=>{
+			if( !i._active ) return
+			i.move( SECONDS_PER_TICK )
+			if( quadTree.boundary.intersects( i.boundary )){
+				i.checkIntersections( quadTree.getInsertions( i.boundary ))
+			}else{
+				i._active = false	
+			}
 		})
 
 		/* CAMERA ///////////////////////////////////////////////
@@ -156,12 +161,14 @@ function _main_(){
 			// }
 		}
 		
-		for( let i = 0; i < bullets.length; i++){
-			bullets[i].draw( drawTime, ctx, camera.boundary, viewport )
-		}
-		for ( let i = 0; i < stamps.length; i++){
-			stamps[i].draw( drawTime, ctx, camera.boundary, viewport )
-		}
+		projectiles.forEach((i)=>{
+			if( !i._active ) return
+			i.draw( drawTime, ctx, camera.boundary, viewport )
+		})
+
+		stamps.forEach((i)=>{
+			i.draw( drawTime, ctx, camera.boundary, viewport )
+		})
 		
 		// Draw any of the below for debug
 		// camera.draw( ctx ) // draw bounding box for debug purposes

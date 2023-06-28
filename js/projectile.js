@@ -17,7 +17,7 @@ class Projectile{
 
 		/* Sound barrier at sea level: 343 meters/second 
         barrel length, bullet weight, powder weight*/
-		this._speed = 343 // meters per second (10px per meter)
+		this._speed = 143 // meters per second (10px per meter)
 		this._color = 'red' // paint color
 		this._secondColor = `blue`
 
@@ -31,6 +31,9 @@ class Projectile{
 		
 		// Impact ..
 		this._impact = false
+
+		// Activated?
+		this._active = false
 	}
 	// Getters
 	get x() { return this._x }
@@ -144,6 +147,8 @@ class Projectile{
 		// Calculate the final velocity components
 		this.vX = normalizedDirectionX * this._speed;
 		this.vY = normalizedDirectionY * this._speed;
+
+		this._active = true
 	}
 	checkIntersections( testSet=this._nearby ){
 		//console.info(`checkIntersections()`)
@@ -155,7 +160,7 @@ class Projectile{
 		let minDistance = r // + agent[i].radius
 		let x1 = this._x
 		let y1 = this._y
-		let distance = 0 // Math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
+		let distance = 0 // distance formula Math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
 		// intersection if distance is less than minimum
 		let agent = {}
 		for ( let i = 0; i < testSet.length; i++ ){
@@ -166,7 +171,7 @@ class Projectile{
 			if( distance < minDistance ){	
 				agent.highlight = true
 				this.impact = true
-				// return // return if single impact wanted
+				this._active = false
 			}
 		}
 	}
