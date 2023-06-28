@@ -172,17 +172,15 @@ class Gamey {
 		console.info(`incease: ${percentIncrease}`)// 
 	}
 	fireProjectile ( bullets, player, stamps, utils = this.utils ) {
-		console.info(`fireProjectile()`)
-		// test one bullet
-		// if( bullets.length > 0 ) return // debug
+		// console.info(`fireProjectile()`)
+		// if( bullets.length > 0 ) return // debug // test one bullet
 		let bullet = new Projectile( 0, 0, 10 )
 		bullets.push( bullet )
 		bullet.fire( player.x, player.y )
 
-
 		let p = utils.randomXY( new Rectangle(100,100,500,500) )
-		
-		let pew = new Stamp(`pew`, new Rectangle( p.x,p.y, 0, 0 ), `rgba(250,0,0,1)`)
+
+		let pew = new Stamp( `pew`, new Rectangle( p.x,p.y, 0, 0 ), `rgb(250,0,0)`, 1000 )
 		stamps.push( pew )
 		pew._rotate= utils.gaussianRandom( 40, 20) * 0.017453292519943295
 		pew.fontsize = utils.gaussianRandom(20, 10)

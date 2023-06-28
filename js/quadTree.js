@@ -92,9 +92,9 @@ class QuadTree {
                                                      (i % 2 * halfHeight) + top,
                                                      halfWidth, 
                                                      halfHeight) ) 
-                this.children.push( newQuad )
+                this.children.push( newQuad );
 
-                newQuad.addGenerations( depth-1 )
+                if( depth > 1 ){ newQuad.addGenerations( depth-1 ) }
             }
         }
     }
@@ -138,59 +138,7 @@ class QuadTree {
             this.contents.push( agent )
         }
     } 
-
-    qinsert( agent ){
-        //console.log('insert()')
-        if( this.children.length ){
-            const quads = this.children
-            const { x, y } = this.boundary.midpoint
-            const { left: l, right: r, top: t, bottom: b } = agent.boundary
-            //  0  1 quads
-            //  2  3 quads
-            //   0   folds.. folds come in handy for tracking over laps.. implement later.
-            //  3+1  folds
-            //   2   folds
-            if( r < x && b < y ){ 
-                // console.log(`top left`)
-                quads[0].insert( agent )
-            } else if( l > x && b < y ){
-                // console.log(`top right`)
-                quads[1].insert( agent )
-            } else if( r < x && t > y ){
-                // console.log(`bottom left`)
-                quads[2].insert( agent )
-            } else if( l > x && t > y ){
-                // console.log(`bottom right`)
-                quads[3].insert( agent )
-            } else if( l < x && r > x && b < y ){
-                // console.log(`t fold`)
-                quads[0].insert( agent )
-                quads[1].insert( agent )
-                // quadsFolds[0].insert( agent )
-            } else if(( l < x && r > x && t > y )) {
-                // console.log(`b fold`)
-                quads[2].insert( agent )
-                quads[3].insert( agent )
-            } else if( t < y && b > y && r < x ){
-                // console.log(`l fold`)
-                quads[0].insert( agent )
-                quads[2].insert( agent )
-            } else if( t < y && b > y && l > x ){
-                // console.log(`r fold`)
-                quads[1].insert( agent )
-                quads[3].insert( agent )
-            } else {
-                // console.log(`center`)
-                quads[0].insert( agent )
-                quads[1].insert( agent )
-                quads[2].insert( agent )
-                quads[3].insert( agent )
-            }
-        } else {
-            // console.log(`depth:${this.generation}`)
-            this.contents.push( agent )
-        }
-    }    
+   
     getInsertions( bounds, ins=[] ){
         // console.log(`getInsertions(), ${this.generation}`)
         if( this.children.length ){

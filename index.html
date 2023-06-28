@@ -1,105 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<!-- Required meta tags -->
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-	<title>RPG+RTS</title>
-
-	<meta name="description" content="Role Playing & Real Time Strategy Game">
-	<meta name="author" content="jason">
-
-	<link rel="stylesheet" href="/css/main.css">
-</head>
-<body onload="_main_()">
-<canvas id="mainCanvas"></canvas>
-
-<div id="guiWrap" hidden>
-	<div id="clock">
-		
-	</div>
-
-	<div class="navbar">
-		<a href="#" onclick="menu.hide()">Resume</a>
-		<a href="#">Exit</a>
-		<div class="dropdown">
-			<button class="dropbtn">Options
-				<i class="fa fa-caret-down"></i>
-			</button>
-			<div class="dropdown-content">
-				<a href="#" onclick="menu.audio()">Audio</a>
-				<a href="#">Keyboard</a>
-				<a href="#">Visual					
-				<a href="#">Mouse</a>
-			</div>
-		</div>
-	</div> 
-
-	<div id="mixer">
-		<div id="masterVolume">
-			Master Volume
-			<input type="range" class="volRange" min="0" max="100" value="100" oninput="audio.volumeSync( this )">
-			<input type="number" class="volValue" min="0" max="100" value="100" oninput="audio.volumeSync( this )">
-		</div>
-		
-		<div>
-			<button id="addButton" onclick="audio.addWavChan()">Add .wav Channel</button>
-			<button id="loadButton" onclick="">Load Mix</button>
-			<button id="saveButton" onclick="audio.saveMix()">Save Mix</button>
-			<input type="text" id="mixName">
-		</div>
-
-		<div id="template-wavChannel" class="wavChannel template">
-			<span class="wavNum">0</span>
-			<input type="file" class="channFile" multiple="false" onchange="audio.wavFileLoad(this)">
-			<i class="ico fa fa-volume-up"></i>
-			<input type="range" class="volRange" min="0" max="100" value="100" oninput="audio.volAdjust(this)">
-			<input type="number" class="volValue" min="0" max="100" value="100" oninput="audio.volAdjust(this)">
-			<audio>
-				<source scr="" type="audio/wav">
-			</audio>
-			<i class="ico fa fa-play" onclick="audio.play( this )"></i>
-			<i class="ico fa fa-pause" onclick="audio.pause( this )"></i>
-			<input type="range" class="durRange" min="0" step=".1" value="" oninput="audio.currentTime(this)">
-			<label for="" class="curLabel">0</label> 
-			<label for="" class="durLabel"> / 0</label>
-			<span class="randomizeForm">
-				<i class="ico fa fa-random" onclick="audio.wavRandomize(this)"></i>
-				<label>Repeat delay min</label>
-				<input type="number" class="minDelay" value="0" min="0" step="100">
-				<label>max</label>
-				<input type="number" class="maxDelay" value="0" min="0" step="100">
-				<label>milSec</label>
-			</span>
- 		</div>
-	</div>
-
-	<audio><source scr="" type="audio/wav"></audio>
-	<audio><source scr="" type="audio/wav"></audio>
-	<audio><source scr="" type="audio/wav"></audio>
-	<audio><source scr="" type="audio/wav"></audio>
-</div>
-
-<!-- Javascript Files -->
-<script src="js/utility_funcs.js"></script>
-
-<script src="js/menu.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/keyboard.js"></script>
-<script src="js/mouse.js"></script>
-
-<script src="js/rectangle.js"></script>
-<script src="js/stamp.js"></script>
-
-<script src="js/terrain.js"></script>
-<script src="js/agent.js"></script>
-<script src="js/viewport.js"></script>
-<script src="js/camera.js"></script>
-<script src="js/gamey.js"></script>
-<script src="js/projectile.js"></script>
-<script src="js/quadTree.js"></script>
-<script src="js/main.js"></script>
-<script src="js/gtp.js"></script>
-</body>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>RPG+RTS</title>
+    <meta name="description" content="Role Playing & Real Time Strategy Game">
+    <meta name="author" content="jason">
+    <link rel="stylesheet" href="/css/main.css">
+  </head>
+  <body onload="_main_()">
+    <canvas id="mainCanvas"></canvas>
+    <div id="guiWrap" hidden>
+      <div class="navbar">
+        <a href="#" onclick="menu.hide()">Resume</a>
+        <a href="#">Exit</a>
+        <div class="dropdown">
+          <button class="dropbtn">Options <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="#" onclick="menu.audio()">Audio</a>
+            <a href="#">Keyboard</a>
+            <a href="#">Visual <a href="#">Mouse</a>
+          </div>
+        </div>
+      </div>
+      <div id="mixer">
+        <div id="masterVolume"> Master Volume <input type="range" class="volRange" min="0" max="100" value="100" oninput="audio.volumeSync( this )">
+          <input type="number" class="volValue" min="0" max="100" value="100" oninput="audio.volumeSync( this )">
+        </div>
+        <div>
+          <button id="addButton" onclick="audio.addWavChan()">Add .wav Channel</button>
+          <button id="loadButton" onclick="">Load Mix</button>
+          <button id="saveButton" onclick="audio.saveMix()">Save Mix</button>
+          <input type="text" id="mixName">
+        </div>
+        <div id="template-wavChannel" class="wavChannel template">
+          <span class="wavNum">0</span>
+          <input type="file" class="channFile" multiple="false" onchange="audio.wavFileLoad(this)">
+          <i class="ico fa fa-volume-up"></i>
+          <input type="range" class="volRange" min="0" max="100" value="100" oninput="audio.volAdjust(this)">
+          <input type="number" class="volValue" min="0" max="100" value="100" oninput="audio.volAdjust(this)">
+          <audio>
+            <source scr="" type="audio/wav">
+          </audio>
+          <i class="ico fa fa-play" onclick="audio.play( this )"></i>
+          <i class="ico fa fa-pause" onclick="audio.pause( this )"></i>
+          <input type="range" class="durRange" min="0" step=".1" value="" oninput="audio.currentTime(this)">
+          <label for="" class="curLabel">0</label>
+          <label for="" class="durLabel"> / 0</label>
+          <span class="randomizeForm">
+            <i class="ico fa fa-random" onclick="audio.wavRandomize(this)"></i>
+            <label>Repeat delay min</label>
+            <input type="number" class="minDelay" value="0" min="0" step="100">
+            <label>max</label>
+            <input type="number" class="maxDelay" value="0" min="0" step="100">
+            <label>milSec</label>
+          </span>
+        </div>
+      </div>
+      <audio>
+        <source scr="" type="audio/wav">
+      </audio>
+      <audio>
+        <source scr="" type="audio/wav">
+      </audio>
+      <audio>
+        <source scr="" type="audio/wav">
+      </audio>
+      <audio>
+        <source scr="" type="audio/wav">
+      </audio>
+    </div>
+    <!-- Javascript Files -->
+    <script src="js/utility_funcs.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/keyboard.js"></script>
+    <script src="js/mouse.js"></script>
+    <script src="js/rectangle.js"></script>
+    <script src="js/stamp.js"></script>
+    <script src="js/terrain.js"></script>
+    <script src="js/agent.js"></script>
+    <script src="js/viewport.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/gamey.js"></script>
+    <script src="js/projectile.js"></script>
+    <script src="js/quadTree.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/gtp.js"></script>
+  </body>
 </html>

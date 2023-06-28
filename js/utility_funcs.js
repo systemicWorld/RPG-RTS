@@ -51,7 +51,7 @@ class Utilities {
 
 	randomXY( boundary ){
 		const { left, top, width, height } = boundary
-		console.log(`left:${left}, width:${width}`)
+		// console.log(`left:${left}, width:${width}`)
 		return {x: Math.random() * width + left,
 				 		y: Math.random() * height + top }
 	}

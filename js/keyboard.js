@@ -1,7 +1,7 @@
 // Declaring a Class, helps determine what keys user is/has pressing
 class Keyboard {
 	constructor() {
-		this._buffer = [] // buffer of clicked keys 
+		this._buffer = []
 
 		this._pressedKeys = {
 			menu: false,
@@ -21,22 +21,26 @@ class Keyboard {
 			32: 'fire'
 		}
 		// create listeners
-		window.addEventListener( "keydown", (event)=>{ this.keyDown(event, this._pressedKeys, this._keyMap) } )
-		window.addEventListener( "keyup", (event)=>{ this.keyUp(event, this._pressedKeys, this._keyMap) } )
+		window.addEventListener( "keydown", (event)=>{ this.keyDown(this._buffer, event, this._pressedKeys, this._keyMap) } )
+		window.addEventListener( "keyup", (event)=>{ this.keyUp(this._buffer, event, this._pressedKeys, this._keyMap) } )
 	}
 	// Getters
 	get pressedKeys() { return this._pressedKeys }
-
+	get buffer() { return this._buffer }
 	// Setters
 	// Methods
-	keyDown( e, pressedKeys, keyMap ) {
-		//console.info(`keyDown(${e.keyCode})`)
+	keyDown( buffer, e, pressedKeys, keyMap ) {
+		// console.info(`keyDown(${e.keyCode})`)
+		// console.info(`keyUp(${e.type})`)
 		let key = keyMap[e.keyCode]
-    	pressedKeys[key] = true
+		pressedKeys[key] = true
+		buffer.push(e)
 	}
-	keyUp( e, pressedKeys, keyMap ) {
-		//console.info(`keyUp(${e.keyCode})`)
+	keyUp( buffer, e, pressedKeys, keyMap ) {
+		// console.info(`keyUp(${e.keyCode})`)
+		// console.info(`keyUp(${e.type})`)
 		let key = keyMap[e.keyCode] // use event.key for actual letters
 		pressedKeys[key] = false
+		buffer.push(e)
 	}
 }

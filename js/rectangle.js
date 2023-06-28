@@ -60,8 +60,17 @@ class Rectangle {
   set height( number ) {
     this._height = number
     this._bottom = this._top + this._height
-    this._midpoint.y = this._top+(0.5*this._height) } 
-
+    this._midpoint.y = this._top+(0.5*this._height) }
+  set right( number ){
+    this._right = number
+    this._left = this._right - this._width
+    this._midpoint.y = this._top+(0.5*this._height) }
+  set bottom( number ){
+    this._bottom = number
+    this._top = this._bottom - this._height
+    this._midpoint.y = this._top+(0.5*this._height) }
+  
+  // METHODS
   contains(point) {
     return (point.x >= this._left &&
             point.x < this._right &&

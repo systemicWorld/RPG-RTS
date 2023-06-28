@@ -12,7 +12,7 @@ function _main_(){
 	let ctx = canvas.getContext("2d")
 
 	let viewport = new Viewport( new Rectangle( 0, 0, cWidth, cHeight ) )
-	let camera = new Camera( 0, 0, viewport.boundary.width * viewport.aspectRatio, viewport.boundary.height * viewport.aspectRatio )
+	let camera = new Camera( new Rectangle( 0, 0, viewport.boundary.width * viewport.aspectRatio, viewport.boundary.height * viewport.aspectRatio) )
 
 	let terrain = new Terrain( new Rectangle( 0, 0, 1.05 * cWidth, 1.05 * cHeight ) );
 
@@ -42,75 +42,80 @@ function _main_(){
 		/* QuadTree */
 		quadTree = new QuadTree( 3, undefined, 0, new Rectangle( 0, 0, terrain.boundary.width, terrain.boundary.height ) )
 		quadTree.addGenerations( 1 )
-
-		// stamps.push( new Stamp(`pew`, new Rectangle(120,200,0,0), `rgba(250,0,0,1)`))
-		// stamps[0]._rotate=20 * 0.017453292519943295
-		// stamps[0].fontsize = 20
-		// stamps.push( new Stamp(`pew`, new Rectangle(150,250,0,0), `rgba(250,0,0,1)`))
-		// stamps[1]._rotate=10 * 0.017453292519943295
-		// stamps[1].fontsize = 20
-		// stamps.push( new Stamp(`pew!`, new Rectangle(190,200,0,0), `rgba(250,0,0,1)`))
-		// stamps[2]._rotate=40 * 0.017453292519943295
-		// stamps[2].fontsize = 40
 	}
 
-	function update_game( /*currently global SECONDS_PER_TICK*/) {
+	function update_game() {
+		// Use SECONDS_PER_TICK for simulation
 		// update the state of the world based on determined time step
 		// dont update if player wants pause
 		if ( keyboard.pressedKeys.menu ) { // escape key pressed === true
 			menu.show()
 		}
 
-		{ // move player based on keyboard state		
-			if( keyboard.pressedKeys.up && !keyboard.pressedKeys.down ) {
-				player.y -= player.speed * SECONDS_PER_TICK
-			}
-			if( keyboard.pressedKeys.right && !keyboard.pressedKeys.left ){
-				player.x += player.speed  * SECONDS_PER_TICK
-			}
-			if( keyboard.pressedKeys.down && !keyboard.pressedKeys.up ) {
-				player.y += player.speed * SECONDS_PER_TICK
-			}
-			if( keyboard.pressedKeys.left && !keyboard.pressedKeys.right ){
-				player.x -= player.speed * SECONDS_PER_TICK
-			}
-		}
-		{
-			if( keyboard.pressedKeys.fire ){
-				gamey.fireProjectile( bullets, player, stamps )
-			}
-		}
-
-		{ 
-			while ( mouse.buffer.length > 0 ){
-				switch( mouse.buffer.shift() ) {
+		while( keyboard.buffer.length > 0 ){
+			let event = keyboard.buffer.shift()
+			if( event.type == `keydown`	){
+				switch( keyboard._keyMap[event.keyCode] ){
+					case `up`:
+						player.vY = -player._speed
+						break
 					case `left`:
-						// console.log(`left click`)
-						player.y = mouse.y+camera.top
-						player.x = mouse.x+camera.left
-						gamey.createAgentNextToAgent( utils, agents, agents[0] )
-						break;
-					case `middle`:
-						// console.log(`mid click`)
+						player.vX = -player._speed
+						break
+					case `down`:
+						player.vY = player._speed
 						break;
 					case `right`:
-						// console.log(`right click`)
-						// move the player to click coordinate
-						player.y = mouse.y+camera.top
-						player.x = mouse.x+camera.left
-						break;
-					default:
-						console.error(`undefined button clicked`)
+						player.vX = player._speed
+						break
+					case `fire`:
+						gamey.fireProjectile( bullets, player, stamps )
+						break
+				}
+			}else if( event.type == `keyup`){
+				switch( keyboard._keyMap[event.keyCode] ){
+					case `up`:
+					case `down`:
+						player.vY = 0
+						break
+					case `left`:
+					case `right`:
+						player.vX = 0
+						break
 				}
 			}
 		}
+
+		while( mouse.buffer.length > 0 ){
+			switch( mouse.buffer.shift() ){
+				case `left`:
+					// console.log(`left click`)
+					player.y = mouse.y + camera.boundary.top
+					player.x = mouse.x + camera.boundary.left
+					gamey.createAgentNextToAgent( utils, agents, agents[0] )
+					break;
+				case `middle`:
+					// console.log(`mid click`)
+					break;
+				case `right`:
+					// console.log(`right click`)
+					// move the player to click coordinate
+					player.y = mouse.y + camera.boundary.top
+					player.x = mouse.x + camera.boundary.left
+					break;
+				default:
+					console.error(`undefined button clicked`)
+			}
+		}
+	
 		// Do AI
-		for( let i = 1; i < agents.length; i++ ) {
+		for( let i = 0; i < agents.length; i++ ) {
 			// agents[i].avoid( player, SECONDS_PER_TICK )
 			// agents[i].bond(SECONDS_PER_TICK)
-			agents[i].act(player, SECONDS_PER_TICK)
+			agents[i].act( player, SECONDS_PER_TICK )
 		}
-		bullets.forEach( i => { i.move( dTime ) })
+
+		bullets.forEach( i => { i.move( SECONDS_PER_TICK ) })
 		for( let i = 0, agent = {}; i < agents.length; i++ ){
 			agent = agents[i]
 			agent.nearby = []
@@ -129,102 +134,42 @@ function _main_(){
 		// Adjust at end to determine what's an intersting view
 		// Rule 1: Player never leaves the view
 		///////////////////////////////////////////////////////*/
-		camera.nearEdgeAsymptotic( player.x, player.y, terrain.width, terrain.height )
+		camera.nearEdgeAsymptotic( player.x, player.y )
 		quadTree.clear()
 	}
 
+	let drawTime = 0
 	function display_game( ) { // FPS is throttled by browsers, and there's no interpolation
-		// clear the screen
+		// Use dTime/1000 for drawing
+		drawTime = dTime/1000
+		// clear the screen, may not be needed in the future ..
 		ctx.fillStyle = 'black'
 		ctx.fillRect( 0, 0, cWidth, cHeight )
 		// draw the state of the world // should be draw the state of what the camera bounds
-		terrain.draw( ctx, camera, viewport ) // non-performant??
-	
-		// // Save the current canvas state
-		// ctx.save();
+		terrain.draw( drawTime, ctx, camera.boundary, viewport ) // non-performant??
 
-		// let textRBGA = `rgba(0,0,0,.5)`
-		// // Set the font properties
-		// ctx.font = '40px Arial';
-		// ctx.fillStyle = textRBGA;
-
-		// // Set the shadow properties
-		// ctx.shadowColor = 'rgba(220, 220, 220, 0.5)';
-		// ctx.shadowBlur = 5;
-		// ctx.shadowOffsetX = 2;
-		// ctx.shadowOffsetY = 2;
-
-		// let x0 = ((100 - camera.left) )// + viewLeft
-		// let y0 = ((200 - camera.top) ) //+ viewTop
-		// // let x0 = ((player.x - camera.left) )// + viewLeft
-		// // let y0 = ((player.y - camera.top) ) //+ viewTop
-		// // Translate to the desired position
-		// ctx.translate(x0, y0);
-		// // Rotate the canvas
-		// ctx.rotate(Math.PI / 3); // Rotate by 45 degrees (in radians)
-		// // Draw the text on the canvas
-		// ctx.fillText('BANG', 0, 0);
-		// // Restore the canvas state
-		// ctx.restore();
-
-
-    let drawnObjects = []
+    // let drawnObjects = []
 		for( let i = agents.length-1; i >= 0; i-- ) { // player is 0 so player gets drawn last/on top
-			if ( agents[i].draw( ctx, camera, viewport ) == true ) {
-				drawnObjects.push(agents[i])
-			}
+			agents[i].draw( drawTime, ctx, camera.boundary, viewport )
+			// if ( agents[i].draw( drawTime, ctx, camera.boundary, viewport ) ) {
+			// 	drawnObjects.push(agents[i])
+			// }
 		}
-		gameObjectsOnCamera = drawnObjects
 		
 		for( let i = 0; i < bullets.length; i++){
-			bullets[i].draw( ctx, camera, viewport )
+			bullets[i].draw( drawTime, ctx, camera.boundary, viewport )
 		}
-
 		for ( let i = 0; i < stamps.length; i++){
-			stamps[i].draw( ctx, camera, viewport )
+			stamps[i].draw( drawTime, ctx, camera.boundary, viewport )
 		}
 		
-		//console.log("Objects drawn on cam: "+gameObjectsOnCamera.length)
+		// Draw any of the below for debug
 		// camera.draw( ctx ) // draw bounding box for debug purposes
 		// viewport.draw( ctx )
-		quadTree.drawDeep( ctx, camera, viewport )
+		// quadTree.drawDeep( ctx, camera.boundary, viewport )
+
+		// console.log("Objects drawn on cam: "+drawnObjects.length)
 	}
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	function panic(){
 		console.error("panic()")
@@ -233,7 +178,7 @@ function _main_(){
 	const MAX_TICKS_PER_SECOND = 30
 	const TIME_PER_STEP = 1000 / MAX_TICKS_PER_SECOND // 1000 milliseconds per 60 updates
 	const SECONDS_PER_TICK = TIME_PER_STEP / 1000
-	const MAX_FPS = 30 // The maximum FPS to allow // 30 FPS limit on FireFox (May 2020)
+	const MAX_FPS = 60 // The maximum FPS to allow // 30 FPS limit on FireFox (May 2020)
 	const TIME_PER_PAINT = 1000 / MAX_FPS
 	let lastFrameTimeMs = 0 // The last time the loop was run
 	let dTime = 0 // game or simulation time
@@ -253,7 +198,7 @@ function _main_(){
 		// attempt to simulate a specific number of steps per second
 		numUpdateSteps = 0
 		while( dTime >= TIME_PER_STEP ){
-			update_game()
+			update_game() // simulation uses SECONDS_PER_TICK
 			dTime -= TIME_PER_STEP
 			if( ++numUpdateSteps >= 240 ){
 				panic()
@@ -271,7 +216,7 @@ function _main_(){
 		}
 		framesThisSecond++
 
-		display_game()
+		display_game() // Visuals use dTime
 		requestAnimationFrame( mainLoop )
 	}
 

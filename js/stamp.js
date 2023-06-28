@@ -8,18 +8,23 @@ class Stamp{
    * @constructor
    * @param {string} text
    * @param {Object} boundary
-   * @param {string} color - like: `rgba( r, b , g , a)`
+   * @param {string} color - like: `rgb( r, b , g )`
+	 * @param {number} duration - time before the text fades?
    */
 	constructor(text = null,
 							boundary = null,
-              color = `pink`){
+              color = `pink`,
+							duration = 0){
 		this._text = text
 		this._boundary = boundary
     this._color = color
+		this._duration = duration
+
+		this._fade = 0.8 // will fade out after duration
 
     this._fontsize = `40`+`px`
     this._font = `${this._fontsize} Arial`
-    this._shadowColor = 'rgba(220, 220, 220, 0.5)'
+    this._shadowColor = `rgba(220,220,220,${this._fade})`
     this._shadowBlur = 5
     this._shadowOffsetX = 2
     this._shadowOffsetY = 2
@@ -29,6 +34,8 @@ class Stamp{
 	get text() { return this._text }
 	get boundary() { return this._boundary }
   get color() { return this._color }
+	get face() { return this._fade }
+	get duration() { return this._duration }
 	// SETTERS
 	set text( text ) {
 		this._text = text
@@ -42,15 +49,21 @@ class Stamp{
 	set color( rbga ){
 		this._color = rbga // CSS colors, or RGB[A]() string
 	}
+	/**
+	 * @param {string|number} opacity
+	 */
+	set fade( opacity ){
+		this._fade = opacity
+		// Find the index of the last comma
+		const symbolIndex = this._color.lastIndexOf(',');
+		// Remove characters from the end of the string until the symbol then add new string
+		this.color = this._color.slice(0, symbolIndex + 1) + `${this._fade})`
+	}
   set fontsize( integer ){
     this._fontsize = `${integer}px`
     this._font = `${this._fontsize} Arial`
   }
 	// METHODS
-	method( arg ) {
-		//console.info(`method(${arg})`)
-    	// code
-	}
 	onCam ( camera ){
 		// check if within camera bounds
 		const { left, top, right, bottom } = this._boundary
@@ -63,8 +76,13 @@ class Stamp{
 			return true
 		}
 	}
-	draw( ctx, camera, viewport ){
-    // Save the current canvas state
+	draw( dTime, ctx, camera, viewport ){
+		this._duration -= dTime
+		if(this._duration < 0){
+			return
+		}
+
+		// Save the current canvas state
     ctx.save();
 
 		let drawOnCam = true
@@ -77,7 +95,7 @@ class Stamp{
 
     // Set the font properties
     ctx.font = this._font
-    ctx.fillStyle = this._color;
+    ctx.fillStyle = this._color
 
     // Set the shadow properties
     ctx.shadowColor = this._shadowColor

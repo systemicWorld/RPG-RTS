@@ -3,7 +3,9 @@
  * @class 
  */
 class Projectile{
-	constructor( x = 0, y = 0, radius = 1 ){
+	constructor(x = 0,
+							y = 0,
+							radius = 1 ){
 		this._x = x // 0 is farthest left in game world
 		this._y = y // 0 is highest up in game world
 		this._radius = radius
@@ -15,7 +17,7 @@ class Projectile{
 
 		/* Sound barrier at sea level: 343 meters/second 
         barrel length, bullet weight, powder weight*/
-		this._speed = 0.10 // meters per second (10px per meter)
+		this._speed = 343 // meters per second (10px per meter)
 		this._color = 'red' // paint color
 		this._secondColor = `blue`
 
@@ -35,6 +37,8 @@ class Projectile{
 	get y() { return this._y }
 	get radius() { return this._radius }
 	get speed() { return this._speed }
+	get vX(){ return this._vX }
+	get vY(){ return this._vY }
 	get boundary() { return this._boundary }
 	get impact() { return this._impact }
 	// Setters
@@ -54,7 +58,9 @@ class Projectile{
 																	 radius*2,
 																	 radius*2)
 	}
-	set speed( speed ){ this._speed = speed }
+	set speed( number ){ this._speed = number }
+	set vX( number ){ this._vX = number }
+	set vY( number ){ this._vY = number }
 	/**
    * @param {string} rbga - like: `rgba( r, b , g , a)`
    */
@@ -83,7 +89,7 @@ class Projectile{
 				return true
 			}
 	}
-	draw( ctx, camera, viewport ){
+	draw( dTime, ctx, camera, viewport ){
 		let drawOnCam = true
 		if( this.onCam(camera) ){
 			ctx.fillStyle = this._color // change to gradient below
@@ -97,9 +103,8 @@ class Projectile{
 
 		// Create a radial gradient
 		// context.createRadialGradient(x0,y0,r0,x1,y1,r1); // TEMPLATE CODE
-		//let gradient = ctx.createRadialGradient( this._x, this._y, 0, this._x, this._y, this._radius)
-		let x0 = ((this._x - camera.left) / aR) + viewLeft
-		let y0 = ((this._y - camera.top) / aR) + viewTop
+		let x0 = (this._x + ((this._vX * dTime) - camera.left) / aR ) + viewLeft
+		let y0 = (this._y + ((this._vY * dTime) - camera.top) / aR ) + viewTop
 		let rOutter = this._radius / aR
 
 		let gradient = ctx.createRadialGradient( x0, y0, 0, x0, y0, rOutter )
@@ -118,13 +123,13 @@ class Projectile{
 
 		return drawOnCam
 	}
-	// Acts
-	move( dTime ){
-		this.x += this._vX * dTime
-		this.y += this._vY * dTime
+
+	move( SECONDS_PER_TICK ){
+		this.x += this._vX * SECONDS_PER_TICK
+		this.y += this._vY * SECONDS_PER_TICK
 	}
 	fire( dX, dY ){
-		console.log(``)
+		// console.log(`fire()`)
 		// Calculate the direction from current position to the destination
 		const directionX = dX - this._x;
 		const directionY = dY - this._y;
@@ -137,14 +142,14 @@ class Projectile{
 		const normalizedDirectionY = directionY / magnitude;
 
 		// Calculate the final velocity components
-		this._vX = normalizedDirectionX * this._speed;
-		this._vY = normalizedDirectionY * this._speed;
+		this.vX = normalizedDirectionX * this._speed;
+		this.vY = normalizedDirectionY * this._speed;
 	}
 	checkIntersections( testSet=this._nearby ){
 		//console.info(`checkIntersections()`)
 		if ( testSet.length == 0 ) return
 		
-		console.log(`bullet, nearby:${testSet.length}`)
+		// console.log(`bullet, nearby:${testSet.length}`)
 
 		let r = this._radius
 		let minDistance = r // + agent[i].radius

@@ -12,6 +12,9 @@ class Agent{
 		leg length and mass
 		age, sex, size, fitness */
 		this._speed = speed * 18 + (radius*2) || 1 // meters per second (10px per meter) // taller people walk faster
+		this._vX = 0
+		this._vY = 0
+		
 		this._color = color || 'yellow' // draw color
 		this._secondColor = color
 		this._highlight = false
@@ -76,6 +79,8 @@ class Agent{
 																	 radius*2)
 	}
 	set speed( speed ){ this._speed = speed }
+	set vX( number ){ this._vX = number }
+	set vY( number ){ this._vY = number}
 	set nearby ( quadContents ){ this._nearby = quadContents }
 	/**
    * @param {any} string
@@ -108,9 +113,14 @@ class Agent{
 		this._pregnant = bool
 	}
 	// Methods
-	act( player, dTime ){
+	act( player, SECONDS_PER_TICK ){
 		// console.info(`act()`)
-		this.avoid(player, dTime)
+		// this.avoid(player, SECONDS_PER_TICK)
+		this.move( SECONDS_PER_TICK )
+	}
+	move( SECONDS_PER_TICK ){
+		this.x += this._vX * SECONDS_PER_TICK
+		this.y += this._vY * SECONDS_PER_TICK
 	}
 	onCam ( camera ){
 			// check if within camera bounds
@@ -124,7 +134,7 @@ class Agent{
 				return true
 			}
 	}
-	draw( ctx, camera, viewport ){
+	draw( dTime, ctx, camera, viewport ){
 		let drawOnCam = true
 			if ( this.onCam(camera) ){
 			ctx.fillStyle = this._color // change to gradient below
@@ -161,14 +171,14 @@ class Agent{
 		return drawOnCam
 	}
 	// Acts
-	seek( agent, dTime ){ // move toward gameObject
+	seek( agent, SECONDS_PER_TICK ){ // move toward gameObject
 		let theta = Math.atan2( agent.y - this._y, agent.x - this._x ) // heading
-		let speed = this._speed * dTime
+		let speed = this._speed * SECONDS_PER_TICK
 		this.x += Math.cos ( theta ) * speed
 		this.y += Math.sin ( theta ) * speed
 	}
 
-	avoid( agent, dTime ) { // move away from gameObject
+	avoid( agent, SECONDS_PER_TICK ) { // move away from gameObject
 		return
 		let avoidanceDistance = 50
 		let goX = agent.x
@@ -177,7 +187,7 @@ class Agent{
 		// move away if close
 		if( distance < avoidanceDistance ){
 			let theta = Math.atan2( goY - this._y, goX - this._x ) // heading
-			let speed = this._speed * dTime
+			let speed = this._speed * SECONDS_PER_TICK
 			this.x -= Math.cos ( theta ) * speed
 			this.y -= Math.sin ( theta ) * speed
 		}
@@ -187,7 +197,7 @@ class Agent{
 		//console.info(`checkIntersections()`)
 		if ( testSet.length == 0 ) return
 		
-		console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
+		// console.log(`agent.id:${this.id}, nearby:${testSet.length}`)
 
 		let r = this._radius
 		let minimumDistance = r // + agent[i].radius
@@ -211,7 +221,7 @@ class Agent{
 		}
 	}
 
-	bond( dTime ) { // move towards mate
+	bond( SECONDS_PER_TICK ) { // move towards mate
 		//console.info(`bond()`)
 		if( this._mate == undefined ) return
 		let bondDistance = this._radius + this.mate.radius
@@ -225,7 +235,7 @@ class Agent{
 			return
 		}
 		let theta = Math.atan2( mY - this._y, mX - this._x ) // heading
-		let speed = this._speed * dTime
+		let speed = this._speed * SECONDS_PER_TICK
 		this.x += Math.cos ( theta ) * speed
 		this.y += Math.sin ( theta ) * speed
 	}
@@ -267,8 +277,8 @@ class Agent{
 		}
 	}
 
-	incubate ( dTime, gamey ) { // if pregnant then incubation should happen
-		this._gestationProgress += ( this._gestationSpeed * dTime )
+	incubate ( SECONDS_PER_TICK, gamey ) { // if pregnant then incubation should happen
+		this._gestationProgress += ( this._gestationSpeed * SECONDS_PER_TICK )
 		if ( this._gestationProgress >= this._gestationPeriod ){
 			this.birth()
 		}

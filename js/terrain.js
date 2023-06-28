@@ -13,7 +13,7 @@ class Terrain {
 		this._boundary = boundary
 	}
 	// Methods
-	draw( ctx, camera, viewport ){
+	draw( dTime, ctx, camera, viewport ){
     const { left, top, width, height } = this._boundary
 		const { left: viewLeft, top: viewTop } = viewport.boundary
 		const aR = viewport.aspectRatio
@@ -37,7 +37,7 @@ class Terrain {
 								 top - camera.top,
 								 width,
 								 height)
-		
+		/*
 		ctx.beginPath()
 		ctx.lineWidth = 3/ aR
 		ctx.strokeStyle = "teal"
@@ -45,6 +45,6 @@ class Terrain {
 						 (-camera.top / aR) + viewTop, 
 						 width / aR,
 						 height / aR )
-		ctx.stroke()
+		ctx.stroke()*/
 	}
 }
