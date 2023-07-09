@@ -191,8 +191,12 @@ class Gamey {
 			}
 		}
 
+		let factory = new StampFactory()
+
+		let text = factory.getText(`quotes`)
+
 		const p = utils.randomXY( new Rectangle(100,100,500,500))
-		let pew = new Stamp( `pew`, new Rectangle( p.x,p.y, 0, 0 ), `rgb(250,0,0)`, 10 )
+		let pew = new Stamp( `${text}`, new Rectangle( p.x,p.y, 0, 0 ), `rgb(250,0,0)`, 10 )
 		stamps.push( pew )
 		pew._rotate= utils.gaussianRandom( 40, 20) * 0.017453292519943295
 		pew.fontsize = utils.gaussianRandom(20, 10)
